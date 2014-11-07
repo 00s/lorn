@@ -6,6 +6,7 @@ var plane;
 var island;
 var ocean;
 var scoreboard;
+var lorn;
 
 // Cloud Array
 var clouds = [];
@@ -27,8 +28,8 @@ function preload() {
         { id: "ocean", src: "images/ocean.gif" },
         { id: "yay", src: "sounds/yay.ogg" },
         { id: "thunder", src: "sounds/thunder.ogg" },
-        { id: "engine", src: "sounds/engine.ogg" }
-
+        { id: "engine", src: "sounds/engine.ogg" },
+        { id: "lorn", src: "images/lorn.png" }
     ]);
 }
 
@@ -43,15 +44,35 @@ function init() {
 // Game Loop
 function gameLoop(event) {
     for (var count = 0; count < CLOUD_NUM; count++) {
-          clouds[count].update();
+        //  clouds[count].update();
     }
 
-    collisionCheck();
-    scoreboard.update();
+    //collisionCheck();
+    //scoreboard.update();
     stage.update();
 }
 
+// lorn Character
+var Lorn = (function () {
+    function Lorn(x, y) {
+        this.data = {
+            images: [queue.getResult("lorn")],
+            frames: { width: 28, height: 48, regX: 14, regY: 24 },
+            animations: {
+                stay: 0,
+                walk: [0, 8]
+            }
+        };
+        this.spriteSheet = new createjs.SpriteSheet(this.data);
+        this.animation = new createjs.Sprite(this.spriteSheet, "run");
 
+        this.animation.x = y;
+        this.animation.y = y;
+
+        stage.addChild(this.animation);
+    }
+    return Lorn;
+})();
 
 // Plane Class
 var Plane = (function () {
@@ -247,14 +268,14 @@ function gameStart() {
     var point1 = new createjs.Point();
     var point2 = new createjs.Point();
 
-    ocean = new Ocean();
-    island = new Island();
-    plane = new Plane();
+    // ocean = new Ocean();
+    //island = new Island();
+    //plane = new Plane();
     lorn = new Lorn(300, 300);
 
     for (var count = 0; count < CLOUD_NUM; count++) {
-            clouds[count] = new Cloud();
+        //    clouds[count] = new Cloud();
     }
-    scoreboard = new Scoreboard();
+    //scoreboard = new Scoreboard();
 }
 //# sourceMappingURL=game.js.map
