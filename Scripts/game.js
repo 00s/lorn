@@ -1,5 +1,6 @@
 ﻿var stage;
 var queue;
+var canvas;
 
 // Game Objects
 var plane;
@@ -7,6 +8,14 @@ var island;
 var ocean;
 var scoreboard;
 var lorn;
+
+// ENUM for keys
+Key = {
+	UP : 38,
+	LEFT : 37,
+	RIGHT : 39,
+	SPACE : 32
+}
 
 // Cloud Array
 var clouds = [];
@@ -16,16 +25,14 @@ var CLOUD_NUM = 3;
 var GAME_FONT = "40px Consolas";
 var FONT_COLOUR = "#FFFF00";
 var PLAYER_LIVES = 3;
+var GRAVITY  = 0.6;
+var GROUND_LEVEL = 455;
 
 function preload() {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "plane", src: "images/plane.png" },
-        { id: "island", src: "images/island.png" },
-        { id: "cloud", src: "images/cloud.png" },
-        { id: "ocean", src: "images/ocean.gif" },
         { id: "yay", src: "sounds/yay.ogg" },
         { id: "thunder", src: "sounds/thunder.ogg" },
         { id: "engine", src: "sounds/engine.ogg" },
@@ -35,10 +42,39 @@ function preload() {
 
 function init() {
     stage = new createjs.Stage(document.getElementById("canvas"));
-    stage.enableMouseOver(20);
+    canvas = document.getElementById("canvas")
+    // handlers for keyboard inputs
+    canvas.addEventListener( "keydown", handleKeyDown, false );
+    canvas.addEventListener( "keyup", handleKeyUp, false );
+    
+    //stage.enableMouseOver(20);
     createjs.Ticker.setFPS(40);
     createjs.Ticker.addEventListener("tick", gameLoop);
     gameStart();
+}
+
+// Keyboard handlers
+
+function handleKeyDown(event){
+
+	switch(event.keyCode){
+		
+		case Key.UP:
+			console.log("Key.UP pressed");
+			lorn.startJump();
+			break;
+	}
+}
+
+function handleKeyUp(event){
+
+	switch(event.keyCode){
+		
+		case Key.UP:
+			console.log("Key up");
+			lorn.endJump();
+			break;
+	}
 }
 
 // Game Loop
@@ -49,28 +85,67 @@ function gameLoop(event) {
 
     //collisionCheck();
     //scoreboard.update();
+    lorn.update();
     stage.update();
 }
 
 // lorn Character
 var Lorn = (function () {
+
     function Lorn(x, y) {
+    	
+    	this.jumping = false;
+        this.velocityY = 0.0;
+
         this.data = {
             images: [queue.getResult("lorn")],
             frames: { width: 28, height: 48, regX: 14, regY: 24 },
             animations: {
                 stay: 0,
+                jump: 5,
                 walk: [0, 8]
             }
         };
         this.spriteSheet = new createjs.SpriteSheet(this.data);
-        this.animation = new createjs.Sprite(this.spriteSheet, "run");
+    	
+    	this.walkSprite = new createjs.Sprite(this.spriteSheet, "walk");
+        
+        this.animation = this.walkSprite;
 
-        this.animation.x = y;
+        this.animation.x = x;
         this.animation.y = y;
 
         stage.addChild(this.animation);
+
     }
+    Lorn.prototype.startJump = function () {
+    	if(!this.jumping){
+    		console.log("jump started");
+    		this.velocityY = -13.0;
+    		this.jumping = true;
+    	}
+    }
+
+    Lorn.prototype.endJump = function () {
+		console.log("jump ended");
+    	if(this.velocityY < -5.0){
+    		this.velocityY = -5.0;
+    	}
+    }
+
+    Lorn.prototype.update = function () {
+    	this.velocityY +=GRAVITY;
+    	this.animation.y += this.velocityY;
+    	if(this.jumping)
+    		console.log("velocityY: " + this.velocityY);
+
+    	if(this.animation.y > GROUND_LEVEL){
+    		this.animation.y = GROUND_LEVEL;
+    		this.velocityY = 0.0;
+    		this.jumping = false;
+    	}
+    }
+
     return Lorn;
 })();
 
@@ -271,11 +346,10 @@ function gameStart() {
     // ocean = new Ocean();
     //island = new Island();
     //plane = new Plane();
-    lorn = new Lorn(300, 300);
+    lorn = new Lorn(200, GROUND_LEVEL);
 
     for (var count = 0; count < CLOUD_NUM; count++) {
         //    clouds[count] = new Cloud();
     }
     //scoreboard = new Scoreboard();
 }
-//# sourceMappingURL=game.js.map
