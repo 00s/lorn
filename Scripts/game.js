@@ -30,7 +30,8 @@ var FONT_COLOUR = "#FFFF00";
 var PLAYER_LIVES = 3;
 var GRAVITY  = 0.6;
 var GROUND_LEVEL = 455;
-var FIREBALL_SPEED = 7;
+var FIREBALL_SPEED = 8;
+var LORN_MOVE = 6;
 
 function preload() {
     queue = new createjs.LoadQueue();
@@ -68,6 +69,16 @@ function handleKeyDown(event){
 			console.log("Key.UP pressed");
 			lorn.startJump();
 			break;
+
+		case Key.LEFT:
+			console.log("Key.LEFT pressed");
+			lorn.moveLeft();
+			break;
+
+		case Key.RIGHT:
+			console.log("Key.RIGHT pressed");
+			lorn.moveRight();
+			break;
 	}
 }
 
@@ -76,18 +87,27 @@ function handleKeyUp(event){
 	switch(event.keyCode){
 		
 		case Key.UP:
-			console.log("Key up");
+			console.log("Key.UP released");
 			lorn.endJump();
 			break;
 
 		case Key.SPACE:
-			console.log("Key.SPACE pressed");
+			console.log("Key.SPACE released");
 			x = lorn.animation.x;
 			y = lorn.animation.y;
 
 			fireballs.push(new FireBall(x, y));
 			stage.addChild(fireballs[fireballs.length - 1].animation);
+			break;
 
+		case Key.LEFT:
+			console.log("Key.LEFT released");
+			lorn.stopMovingLeft();
+			break;
+
+		case Key.RIGHT:
+			console.log("Key.RIGHT released");
+			lorn.stopMovingRight();
 			break;
 	}
 }
@@ -117,7 +137,7 @@ var Lorn = (function () {
 
     function Lorn(x, y) {
     	
-    	this.jumping = false;
+    	this.jumping , this.movingLeft , this.movingRight = false;
         this.velocityY = 0.0;
 
         this.data = {
@@ -156,6 +176,22 @@ var Lorn = (function () {
     	}
     }
 
+    Lorn.prototype.moveLeft = function (){
+    	this.movingLeft = true;
+    }
+
+    Lorn.prototype.moveRight = function (){
+    	this.movingRight += true;
+    }
+
+    Lorn.prototype.stopMovingRight = function () {
+    	this.movingRight = false;
+    }
+    Lorn.prototype.stopMovingLeft = function () {
+    	this.movingLeft = false;
+    }
+
+
     Lorn.prototype.update = function () {
     	// apply GRAVITY to vertical velocity
     	this.velocityY +=GRAVITY;
@@ -168,6 +204,11 @@ var Lorn = (function () {
     		this.velocityY = 0.0;
     		this.jumping = false;
     	}
+
+    	if(this.movingLeft)
+    		this.animation.x -= LORN_MOVE;
+    	if(this.movingRight)
+    		this.animation.x += LORN_MOVE;
     }
 
     return Lorn;
