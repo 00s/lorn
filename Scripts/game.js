@@ -33,6 +33,8 @@ var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight);
 var FIREBALL_SPEED = 8;
 var LORN_MOVE = 6;
 var LORN_REG_Y = 24;
+var RIGHT = 1;
+var LEFT = -1;
 
 function preload() {
     queue = new createjs.LoadQueue();
@@ -103,7 +105,7 @@ function handleKeyUp(event){
 			x = lorn.animation.x;
 			y = lorn.animation.y;
 
-			fireballs.push(new FireBall(x, y));
+			fireballs.push(new FireBall(x, y, lorn.getSense()));
 			stage.addChild(fireballs[fireballs.length - 1].animation);
 			break;
 
@@ -141,12 +143,13 @@ function gameLoop(event) {
 
 // lorn Character
 var Lorn = (function () {
-
+	// constructor
     function Lorn(x, y) {
-    	
+    	// variables for movement reference
     	this.jumping , this.movingLeft , this.movingRight = false;
         this.velocityY = 0.0;
 
+        // SpriteSheet setup
         this.data = {
             images: [queue.getResult("lorn")],
             frames: { width: 28, height: 48, regX: 14, regY: 24 },
@@ -156,10 +159,9 @@ var Lorn = (function () {
                 walk: [0, 8]
             }
         };
+
         this.spriteSheet = new createjs.SpriteSheet(this.data);
-    	
     	this.walkSprite = new createjs.Sprite(this.spriteSheet, "walk");
-        
         this.animation = this.walkSprite;
 
         this.animation.x = x;
@@ -168,7 +170,10 @@ var Lorn = (function () {
         stage.addChild(this.animation);
 
     }
+
+    // set lorn for jumping
     Lorn.prototype.startJump = function () {
+
     	if(!this.jumping){
     		console.log("jump started");
     		this.velocityY = -13.0;
@@ -176,28 +181,47 @@ var Lorn = (function () {
     	}
     }
 
+    // set end of jumping move
     Lorn.prototype.endJump = function () {
+		
 		console.log("jump ended");
+    	
     	if(this.velocityY < -5.0){
     		this.velocityY = -5.0;
     	}
     }
 
+    // set lorn for moving to the left
     Lorn.prototype.moveLeft = function (){
+    	
     	this.movingLeft = true;
+		lorn.animation.scaleX = -1;
     }
 
+    // set lorn for moving to the right
     Lorn.prototype.moveRight = function (){
+		
+		lorn.animation.scaleX = 1;
     	this.movingRight += true;
     }
 
-    Lorn.prototype.stopMovingRight = function () {
-    	this.movingRight = false;
-    }
+    // set end of left move
     Lorn.prototype.stopMovingLeft = function () {
+    	
     	this.movingLeft = false;
     }
 
+    // set end of right move
+    Lorn.prototype.stopMovingRight = function () {
+    	
+    	this.movingRight = false;
+    }
+
+    // return sense based on sprite scaleX variable
+    Lorn.prototype.getSense = function () {
+    	
+    	return this.animation.scaleX;
+    }
 
     Lorn.prototype.update = function () {
     	// apply GRAVITY to vertical velocity
@@ -212,6 +236,7 @@ var Lorn = (function () {
     		this.jumping = false;
     	}
 
+    	// verify and apply horizontal moves
     	if(this.movingLeft)
     		this.animation.x -= LORN_MOVE;
     	if(this.movingRight)
@@ -224,8 +249,9 @@ var Lorn = (function () {
 // FireBall Class
 
 var FireBall = (function () {
+
 	// constructor
-	function FireBall (x, y) {
+	function FireBall (x, y, sense) {
 		// spriteSheet setup
 		this.data = {
             images: [queue.getResult("fireball")],
@@ -243,10 +269,15 @@ var FireBall = (function () {
         this.animation.x = x;
         this.animation.y = y;
 
+        // set fireball sense (left or right)
+        this.sense = sense;
+        if(sense < 0)
+        	this.animation.scaleX = sense;
 	}
 
 	FireBall.prototype.update = function () {
-		this.animation.x += FIREBALL_SPEED;
+		
+		this.animation.x += (FIREBALL_SPEED * this.sense);
 	}
 
 
@@ -255,7 +286,9 @@ var FireBall = (function () {
 
 // Plane Class
 var Plane = (function () {
+    
     function Plane() {
+        
         this.image = new createjs.Bitmap(queue.getResult("plane"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
@@ -268,15 +301,20 @@ var Plane = (function () {
         // Play engine sound forever
         createjs.Sound.play("engine", 0, 0, 0, -1, 1, 0);
     }
+    
     Plane.prototype.update = function () {
+    
         this.image.x = stage.mouseX;
     };
+    
     return Plane;
 })();
 
 // Island Class
 var Island = (function () {
+    
     function Island() {
+        
         this.image = new createjs.Bitmap(queue.getResult("island"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
@@ -286,13 +324,17 @@ var Island = (function () {
         stage.addChild(this.image);
         this.reset();
     }
+    
     Island.prototype.reset = function () {
+        
         this.image.y = -this.height;
         this.image.x = Math.floor(Math.random() * stage.canvas.width);
     };
 
     Island.prototype.update = function () {
+        
         this.image.y += this.dy;
+        
         if (this.image.y >= (this.height + stage.canvas.height)) {
             this.reset();
         }
@@ -302,7 +344,9 @@ var Island = (function () {
 
 // Cloud Class
 var Cloud = (function () {
+    
     function Cloud() {
+    
         this.image = new createjs.Bitmap(queue.getResult("cloud"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
@@ -311,7 +355,9 @@ var Cloud = (function () {
         stage.addChild(this.image);
         this.reset();
     }
+    
     Cloud.prototype.reset = function () {
+    
         this.image.y = -this.height;
         this.image.x = Math.floor(Math.random() * stage.canvas.width);
         this.dy = Math.floor(Math.random() * 5 + 5);
@@ -319,8 +365,10 @@ var Cloud = (function () {
     };
 
     Cloud.prototype.update = function () {
+      
         this.image.y += this.dy;
         this.image.x += this.dx;
+      
         if (this.image.y >= (this.height + stage.canvas.height)) {
             this.reset();
         }
