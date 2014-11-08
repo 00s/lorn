@@ -19,6 +19,9 @@ Key = {
 
 // Cloud Array
 var clouds = [];
+// FireBall Array
+var fireballs = [];
+
 
 // Game Constants
 var CLOUD_NUM = 3;
@@ -27,6 +30,7 @@ var FONT_COLOUR = "#FFFF00";
 var PLAYER_LIVES = 3;
 var GRAVITY  = 0.6;
 var GROUND_LEVEL = 455;
+var FIREBALL_SPEED = 7;
 
 function preload() {
     queue = new createjs.LoadQueue();
@@ -36,7 +40,8 @@ function preload() {
         { id: "yay", src: "sounds/yay.ogg" },
         { id: "thunder", src: "sounds/thunder.ogg" },
         { id: "engine", src: "sounds/engine.ogg" },
-        { id: "lorn", src: "images/lorn.png" }
+        { id: "lorn", src: "images/lorn.png" },
+        { id: "fireball", src: "images/fireball.png" }
     ]);
 }
 
@@ -74,17 +79,35 @@ function handleKeyUp(event){
 			console.log("Key up");
 			lorn.endJump();
 			break;
+
+		case Key.SPACE:
+			console.log("Key.SPACE pressed");
+			x = lorn.animation.x;
+			y = lorn.animation.y;
+
+			fireballs.push(new FireBall(x, y));
+			stage.addChild(fireballs[fireballs.length - 1].animation);
+
+			break;
 	}
 }
 
 // Game Loop
 function gameLoop(event) {
-    for (var count = 0; count < CLOUD_NUM; count++) {
-        //  clouds[count].update();
-    }
 
-    //collisionCheck();
-    //scoreboard.update();
+	// update each fireball on stage and remove from stage the ones that are out of view.
+    for (i = 0; i < fireballs.length; i++) {
+    	if(fireballs[i] !== undefined){
+    		fireballs[i].update();
+	    	
+	    	if(fireballs[i].animation.x > stage.canvas.width){
+	    		stage.removeChild(fireballs[i].animation);
+	    		fireballs.splice(i,1);
+	    		console.log("fireball removed")
+	    	}
+    	}
+	}
+
     lorn.update();
     stage.update();
 }
@@ -134,11 +157,12 @@ var Lorn = (function () {
     }
 
     Lorn.prototype.update = function () {
+    	// apply GRAVITY to vertical velocity
     	this.velocityY +=GRAVITY;
+    	// set lorn vertical position based on velocity
     	this.animation.y += this.velocityY;
-    	if(this.jumping)
-    		console.log("velocityY: " + this.velocityY);
 
+    	// check if lorn is back to the ground and ends jump arch
     	if(this.animation.y > GROUND_LEVEL){
     		this.animation.y = GROUND_LEVEL;
     		this.velocityY = 0.0;
@@ -147,6 +171,38 @@ var Lorn = (function () {
     }
 
     return Lorn;
+})();
+
+// FireBall Class
+
+var FireBall = (function () {
+	// constructor
+	function FireBall (x, y) {
+		// spriteSheet setup
+		this.data = {
+            images: [queue.getResult("fireball")],
+            frames: { width: 16, height: 12, regX: 10, regY: 6 },
+            animations: {
+                burn: [0, 5]
+            }
+        };
+
+        this.spriteSheet = new createjs.SpriteSheet(this.data);
+    	this.burnSprite = new createjs.Sprite(this.spriteSheet, "burn");
+        this.animation = this.burnSprite;
+
+		// x and y params used for seting the object in stage
+        this.animation.x = x;
+        this.animation.y = y;
+
+	}
+
+	FireBall.prototype.update = function () {
+		this.animation.x += FIREBALL_SPEED;
+	}
+
+
+	return FireBall;
 })();
 
 // Plane Class
@@ -340,16 +396,19 @@ var Scoreboard = (function () {
 
 // Main Game Function
 function gameStart() {
-    var point1 = new createjs.Point();
-    var point2 = new createjs.Point();
+    //var point1 = new createjs.Point();
+    //var point2 = new createjs.Point();
 
     // ocean = new Ocean();
     //island = new Island();
     //plane = new Plane();
     lorn = new Lorn(200, GROUND_LEVEL);
+    //fireballs = new createjs.Container();
 
-    for (var count = 0; count < CLOUD_NUM; count++) {
-        //    clouds[count] = new Cloud();
-    }
+
+
+    // for (var count = 0; count < CLOUD_NUM; count++) {
+    //     //    clouds[count] = new Cloud();
+    // }
     //scoreboard = new Scoreboard();
 }
