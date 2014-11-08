@@ -165,14 +165,13 @@ var Lorn = (function () {
             frames: { width: 28, height: 48, regX: 14, regY: 24 },
             animations: {
                 stay: 0,
-                jump: 5,
+                jump: { frames: [4,5], next: "walk"},
                 walk: [0, 8]
             }
         };
 
         this.spriteSheet = new createjs.SpriteSheet(this.data);
-    	this.walkSprite = new createjs.Sprite(this.spriteSheet, "walk");
-        this.animation = this.walkSprite;
+        this.animation = new createjs.Sprite(this.spriteSheet, "walk");
 
         this.animation.x = x;
         this.animation.y = y;
@@ -245,6 +244,9 @@ var Lorn = (function () {
     		this.velocityY = 0.0;
     		this.jumping = false;
     	}
+
+    	if(this.jumping)
+    		this.animation.gotoAndPlay("jump");
 
     	// verify and apply horizontal moves
     	if(this.movingLeft)
