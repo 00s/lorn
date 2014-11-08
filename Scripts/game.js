@@ -29,9 +29,10 @@ var GAME_FONT = "40px Consolas";
 var FONT_COLOUR = "#FFFF00";
 var PLAYER_LIVES = 3;
 var GRAVITY  = 0.6;
-var GROUND_LEVEL = 455;
+var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight);
 var FIREBALL_SPEED = 8;
 var LORN_MOVE = 6;
+var LORN_REG_Y = 24;
 
 function preload() {
     queue = new createjs.LoadQueue();
@@ -48,10 +49,16 @@ function preload() {
 
 function init() {
     stage = new createjs.Stage(document.getElementById("canvas"));
-    canvas = document.getElementById("canvas")
+    canvas = document.getElementById("canvas");
+
+    canvas.width = document.body.clientWidth; //document.width is obsolete
+    canvas.height = GROUND_LEVEL; //document.height is obsolete
+    canvasW = canvas.width;
+    canvasH = canvas.height;
+
     // handlers for keyboard inputs
-    canvas.addEventListener( "keydown", handleKeyDown, false );
-    canvas.addEventListener( "keyup", handleKeyUp, false );
+    window.addEventListener( "keydown", handleKeyDown, false );
+    window.addEventListener( "keyup", handleKeyUp, false );
     
     //stage.enableMouseOver(20);
     createjs.Ticker.setFPS(40);
@@ -199,8 +206,8 @@ var Lorn = (function () {
     	this.animation.y += this.velocityY;
 
     	// check if lorn is back to the ground and ends jump arch
-    	if(this.animation.y > GROUND_LEVEL){
-    		this.animation.y = GROUND_LEVEL;
+    	if(this.animation.y > GROUND_LEVEL - LORN_REG_Y){
+    		this.animation.y = GROUND_LEVEL - LORN_REG_Y;
     		this.velocityY = 0.0;
     		this.jumping = false;
     	}
@@ -443,7 +450,7 @@ function gameStart() {
     // ocean = new Ocean();
     //island = new Island();
     //plane = new Plane();
-    lorn = new Lorn(200, GROUND_LEVEL);
+    lorn = new Lorn(200, GROUND_LEVEL - LORN_REG_Y);
     //fireballs = new createjs.Container();
 
 
