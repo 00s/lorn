@@ -3,11 +3,9 @@ var queue;
 var canvas;
 
 // Game Objects
-var plane;
-var island;
-var ocean;
 var scoreboard;
 var lorn;
+var cat;
 
 // ENUM for keys
 Key = {
@@ -29,10 +27,12 @@ var GAME_FONT = "40px Consolas";
 var FONT_COLOUR = "#FFFF00";
 var PLAYER_LIVES = 3;
 var GRAVITY  = 0.6;
-var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight);
-var FIREBALL_SPEED = 8;
+var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight) - 15;
+var FIREBALL_SPEED = 9;
 var LORN_MOVE = 6;
 var LORN_REG_Y = 24;
+var CAT_REG_Y = 16;
+var CAT_MOVE = 5;
 var RIGHT = 1;
 var LEFT = -1;
 
@@ -45,7 +45,8 @@ function preload() {
         { id: "thunder", src: "sounds/thunder.ogg" },
         { id: "engine", src: "sounds/engine.ogg" },
         { id: "lorn", src: "images/lorn.png" },
-        { id: "fireball", src: "images/fireball.png" }
+        { id: "fireball", src: "images/fireball.png" },
+        { id: "cat", src: "images/cat.png"}
     ]);
 }
 
@@ -129,7 +130,7 @@ function gameLoop(event) {
     	if(fireballs[i] !== undefined){
     		fireballs[i].update();
 	    	
-	    	if(fireballs[i].animation.x > stage.canvas.width){
+	    	if(fireballs[i].animation.x > canvasW){
 	    		stage.removeChild(fireballs[i].animation);
 	    		fireballs.splice(i,1);
 	    		console.log("fireball removed")
@@ -138,8 +139,17 @@ function gameLoop(event) {
 	}
 
     lorn.update();
+    cat.update();
     stage.update();
 }
+
+
+/* CLASSES
+ * 
+ * Lorn(x, y)
+ * FireBall(x, y, sense)
+ * Cat(x, y)
+*/
 
 // lorn Character
 var Lorn = (function () {
@@ -282,6 +292,42 @@ var FireBall = (function () {
 
 
 	return FireBall;
+})();
+
+
+// Cat Class
+
+var Cat = (function () {
+	function Cat(x, y) {
+		this.data ={
+			framerate: 40,
+			images: [queue.getResult("cat")],
+			frames: { width: 36, height: 32, regX: 18, regY: 16},
+			animations: {
+				sit: 8,
+				standUp: [7, 6, 0],
+				walk: [0,5, "walk", 1]
+			}
+		};
+        this.spriteSheet = new createjs.SpriteSheet(this.data);
+    	this.walkSprite = new createjs.Sprite(this.spriteSheet, "walk");
+        this.animation = this.walkSprite;
+		
+		// x and y params used for seting the object in stage
+        this.animation.x = x;
+        this.animation.y = y;
+
+        stage.addChild(this.animation);
+	}
+
+	Cat.prototype.update = function () {
+		
+		this.animation.x += -(CAT_MOVE);
+		if(this.animation.x < 0)
+			this.animation.x = canvasW;
+	}
+
+	return Cat;
 })();
 
 // Plane Class
@@ -499,6 +545,7 @@ function gameStart() {
     //island = new Island();
     //plane = new Plane();
     lorn = new Lorn(200, GROUND_LEVEL - LORN_REG_Y);
+    cat = new Cat(canvasW, GROUND_LEVEL - CAT_REG_Y);
     //fireballs = new createjs.Container();
 
 
