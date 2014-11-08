@@ -164,7 +164,7 @@ var Lorn = (function () {
             images: [queue.getResult("lorn")],
             frames: { width: 28, height: 48, regX: 14, regY: 24 },
             animations: {
-                stay: 0,
+                stay: { frames: [0,0], next: "walk"},
                 jump: { frames: [4,5], next: "walk"},
                 walk: [0, 8]
             }
@@ -253,6 +253,9 @@ var Lorn = (function () {
     		this.animation.x -= LORN_MOVE;
     	if(this.movingRight)
     		this.animation.x += LORN_MOVE;
+
+    	if(!this.movingLeft && !this.movingRight && !this.jumping)
+    		this.animation.gotoAndPlay("stay");
     }
 
     return Lorn;
