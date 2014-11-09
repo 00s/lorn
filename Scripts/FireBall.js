@@ -11,9 +11,9 @@ var FireBall = (function () {
 		// spriteSheet setup
 		this.data = {
             images: [queue.getResult("fireball")],
-            frames: { width: this._width, height: this._height, regX: 10, regY: 6 },
+            frames: { width: this._width, height: this._height, regX: 10, regY: 6},
             animations: {
-                burn: [0, 5]
+                burn: [0, 5, "burn", 0.4]
             }
         };
 

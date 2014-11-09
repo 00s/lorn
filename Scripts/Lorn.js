@@ -102,7 +102,7 @@ var Lorn = (function () {
     		setTimeout( function(){
     			_this.animation.alpha = 1.0;
     			_this.hitten = false;
-    			console.log("back to the game.")
+    			console.log("back to the game with " + _this.lives+ " lives.")
     		}, RECOVERING_TIME);
     	}else{
     		// GAME OVER
@@ -126,9 +126,9 @@ var Lorn = (function () {
     		this.animation.gotoAndPlay("jump");
 
     	// verify and apply horizontal moves
-    	if(this.movingLeft)
+    	if(this.movingLeft && this.animation.x > this._width - 14)
     		this.animation.x -= LORN_MOVE;
-    	if(this.movingRight)
+    	if(this.movingRight && this.animation.x <= window.innerWidth - this._width + 14)
     		this.animation.x += LORN_MOVE;
 
     	if(!this.movingLeft && !this.movingRight && !this.jumping)
