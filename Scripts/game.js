@@ -24,7 +24,7 @@ var trees = [];
 var cats = [];
 
 // Game Constants
-var TREE_NUM = 8;
+var TREE_NUM = 11;
 var GAME_FONT = "40px Consolas";
 var FONT_COLOUR = "#FFFF00";
 var PLAYER_LIVES = 3;
@@ -109,7 +109,7 @@ function handleKeyUp(event){
 			x = lorn.animation.x;
 			y = lorn.animation.y;
 
-			fireballs.push(new FireBall(x, y, lorn.getSense()));
+			fireballs.push(new FireBall(x, y, lorn.getSense(false)));
 			stage.addChild(fireballs[fireballs.length - 1].animation);
 			break;
 
@@ -158,14 +158,20 @@ function gameLoop(event) {
 
     for(var count = 0 ; count < TREE_NUM ; count++){
         var tree = trees[count];
-        tree.move();
-        if(tree.image.x < -(tree.width)){
-            tree.image.x = canvasW + 100;
+        tree.move(lorn.getSense(true));
+        
+        // reuse trees when they are out of the bounds
+        if(tree.image.x < -(canvasW * 0.5)){
+            tree.image.x = canvasW + canvasW * 0.25;
         }
+        if(tree.image.x > canvasW + canvasW * 0.5){
+            tree.image.x = -(canvasW * 0.25)
+        }
+
     }
 
     lorn.update();
-    cat.update();
+    cat.update(lorn.getSense(true));
     scoreboard.update;
     stage.update();
 }
@@ -245,16 +251,19 @@ function gameStart() {
 
 
     var zOrder = [];
+    // randomize values for parallax effect
     for (var count = 0; count < TREE_NUM; count++) {
         zOrder.push((Math.random() - 0.5)+1.0);
     }
+        // sort results for setting up trees order
         zOrder.sort();
 
+    // add trees at the stage based on zOrder list (in ascending order)
     for (var count = 0; count < TREE_NUM; count++) {
-        trees[count] = new Tree(Math.random()* canvasW, GROUND_LEVEL, zOrder[count]);
+        trees[count] = new Tree(Math.random()* canvasW * 1.25, GROUND_LEVEL, zOrder[count]);
     }
 
-    lorn = new Lorn(200, GROUND_LEVEL - LORN_REG_Y);
+    lorn = new Lorn(canvasW * 0.5, GROUND_LEVEL - LORN_REG_Y);
     cat = new Cat(canvasW, GROUND_LEVEL - CAT_REG_Y);
 
     scoreboard = new Scoreboard();
