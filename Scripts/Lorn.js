@@ -86,9 +86,9 @@ var Lorn = (function () {
     }
 
     // return sense based on sprite scaleX variable
-    Lorn.prototype.getSense = function () {
+    Lorn.prototype.getSense = function (considerIdle) {
     	
-    	return this.animation.scaleX;
+    	return (this.isIdle() && considerIdle) ? 0 : this.animation.scaleX;
     }
 
     // if lorn wasHitten, check lives and set hitten delay
@@ -107,6 +107,11 @@ var Lorn = (function () {
     	}else{
     		// GAME OVER
     	}
+    }
+
+    // check if lorn is not momving
+    Lorn.prototype.isIdle = function (){
+        return (!this.movingLeft && !this.movingRight && !this.jumping);
     }
 
     Lorn.prototype.update = function () {
@@ -131,7 +136,7 @@ var Lorn = (function () {
     	if(this.movingRight && this.animation.x <= window.innerWidth - this._width + 14)
     		this.animation.x += LORN_MOVE;
 
-    	if(!this.movingLeft && !this.movingRight && !this.jumping)
+    	if(this.isIdle())
     		this.animation.gotoAndPlay("idle");
     }
 
