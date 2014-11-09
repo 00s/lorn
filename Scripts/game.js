@@ -34,6 +34,7 @@ var FIREBALL_SPEED = 9;
 var LORN_MOVE = 6;
 var LORN_REG_Y = 24;
 var CAT_REG_Y = 16;
+var CAT_NUM = 4;
 var TREE_REG_Y = 124;
 var RIGHT = 1;
 var LEFT = -1;
@@ -140,10 +141,13 @@ function gameLoop(event) {
                 dismissable = true;
             }
 
-            if(rectCollisionDetection(fireballs[i], cat)){
-                cat.animation.x = canvasW + Math.random()+ 50;
-                dismissable = true;
-                console.log("fireball on target");
+            for (var count = 0; count < CAT_NUM; count++) {
+                var cat = cats[count];
+                if(rectCollisionDetection(fireballs[i], cat)){
+                    cat.randomizeCatDrop();
+                    dismissable = true;
+                    console.log("fireball on target");
+                }
             }
             if(dismissable)
                 dismiss(fireballs[i], fireballs, i);
@@ -151,9 +155,11 @@ function gameLoop(event) {
 	}
 
     if(!lorn.hitten)
-        if(rectCollisionDetection(lorn, cat)){
-            lorn.wasHitten();
-            console.log("Lorn lives: " + lorn.lives);
+        for (var count = 0; count < CAT_NUM; count++) {
+            if(rectCollisionDetection(lorn, cats[count])){
+                lorn.wasHitten();
+                console.log("Lorn lives: " + lorn.lives);
+            }
         }
 
     for(var count = 0 ; count < TREE_NUM ; count++){
@@ -171,7 +177,10 @@ function gameLoop(event) {
     }
 
     lorn.update();
-    cat.update(lorn.getSense(true));
+    
+    for (var count = 0; count < CAT_NUM; count++) {
+        cats[count].update(lorn.getSense(true));
+    }
     scoreboard.update;
     stage.update();
 }
@@ -253,18 +262,26 @@ function gameStart() {
     var zOrder = [];
     // randomize values for parallax effect
     for (var count = 0; count < TREE_NUM; count++) {
-        zOrder.push((Math.random() - 0.5)+1.0);
+
+        zOrder.push((Math.random() - 0.5)+0.7);
     }
         // sort results for setting up trees order
         zOrder.sort();
 
+
     // add trees at the stage based on zOrder list (in ascending order)
     for (var count = 0; count < TREE_NUM; count++) {
+
+        console.log("parallax: " + zOrder[count]);
         trees[count] = new Tree(Math.random()* canvasW * 1.25, GROUND_LEVEL, zOrder[count]);
     }
 
     lorn = new Lorn(canvasW * 0.5, GROUND_LEVEL - LORN_REG_Y);
-    cat = new Cat(canvasW, GROUND_LEVEL - CAT_REG_Y);
+
+    for (var count = 0; count < CAT_NUM; count++) {
+
+        cats.push(new Cat());
+    }
 
     scoreboard = new Scoreboard();
 }
