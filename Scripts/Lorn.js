@@ -1,3 +1,5 @@
+var RECOVERING_TIME = 750;
+
 // lorn Character
 var Lorn = (function () {
 	// constructor
@@ -6,6 +8,11 @@ var Lorn = (function () {
     	this.jumping , this.movingLeft , this.movingRight = false;
         this.velocityY = 0.0;
 
+        // live and blink
+        this.lives = 3;
+        //this.hitten = false;
+
+        // sprite size reference
         this._width  = 28;
         this._height = 48;
 
@@ -82,6 +89,24 @@ var Lorn = (function () {
     Lorn.prototype.getSense = function () {
     	
     	return this.animation.scaleX;
+    }
+
+    // if lorn wasHitten, check lives and set hitten delay
+    Lorn.prototype.wasHitten = function (){
+    	if(this.lives-- > 0){
+
+    		this.animation.alpha = 0.5;
+    		this.hitten = true;
+    		
+    		var _this = this;
+    		setTimeout( function(){
+    			_this.animation.alpha = 1.0;
+    			_this.hitten = false;
+    			console.log("back to the game.")
+    		}, RECOVERING_TIME);
+    	}else{
+    		// GAME OVER
+    	}
     }
 
     Lorn.prototype.update = function () {

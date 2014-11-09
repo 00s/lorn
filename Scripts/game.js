@@ -147,6 +147,11 @@ function gameLoop(event) {
     	}
 	}
 
+    if(!lorn.hitten)
+        if(rectCollisionDetection(lorn, cat)){
+            lorn.wasHitten();
+    }
+
     lorn.update();
     cat.update();
     stage.update();
