@@ -5,34 +5,36 @@ var canvas;
 // Game Objects
 var scoreboard;
 var lorn;
-var cat;
 
 // ENUM for keys
 Key = {
-	UP : 38,
-	LEFT : 37,
-	RIGHT : 39,
-	SPACE : 32
+    UP : 38,
+    LEFT : 37,
+    RIGHT : 39,
+    SPACE : 32
 }
 
 // Cloud Array
 var clouds = [];
 // FireBall Array
 var fireballs = [];
-
+// Tree Array
+var trees = [];
+// Cats Array
+var cats = [];
 
 // Game Constants
-var CLOUD_NUM = 3;
+var TREE_NUM = 8;
 var GAME_FONT = "40px Consolas";
 var FONT_COLOUR = "#FFFF00";
 var PLAYER_LIVES = 3;
 var GRAVITY  = 0.6;
-var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight) - 15;
+var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight) - 35;
 var FIREBALL_SPEED = 9;
 var LORN_MOVE = 6;
 var LORN_REG_Y = 24;
 var CAT_REG_Y = 16;
-var CAT_MOVE = 5;
+var TREE_REG_Y = 124;
 var RIGHT = 1;
 var LEFT = -1;
 
@@ -46,7 +48,8 @@ function preload() {
         { id: "engine", src: "sounds/engine.ogg" },
         { id: "lorn", src: "images/lorn.png" },
         { id: "fireball", src: "images/fireball.png" },
-        { id: "cat", src: "images/cat.png"}
+        { id: "cat", src: "images/cat.png"},
+        { id: "tree", src: "images/tree.png"}
     ]);
 }
 
@@ -150,13 +153,24 @@ function gameLoop(event) {
     if(!lorn.hitten)
         if(rectCollisionDetection(lorn, cat)){
             lorn.wasHitten();
+            console.log("Lorn lives: " + lorn.lives);
+        }
+
+    for(var count = 0 ; count < TREE_NUM ; count++){
+        var tree = trees[count];
+        tree.move();
+        if(tree.image.x < -(tree.width)){
+            tree.image.x = canvasW + 100;
+        }
     }
 
     lorn.update();
     cat.update();
+    scoreboard.update;
     stage.update();
 }
 
+// auxiliar function for removing object from list and animation from stage
 function dismiss(obj, list, index){
     stage.removeChild(obj.animation);
     list.splice(index,1);
@@ -226,14 +240,22 @@ function gameStart() {
     // ocean = new Ocean();
     //island = new Island();
     //plane = new Plane();
-    lorn = new Lorn(200, GROUND_LEVEL - LORN_REG_Y);
-    cat = new Cat(canvasW, GROUND_LEVEL - CAT_REG_Y);
+    //tree = new Tree(canvasW -100, GROUND_LEVEL, 0.5);
     //fireballs = new createjs.Container();
 
 
+    var zOrder = [];
+    for (var count = 0; count < TREE_NUM; count++) {
+        zOrder.push((Math.random() - 0.5)+1.0);
+    }
+        zOrder.sort();
 
-    // for (var count = 0; count < CLOUD_NUM; count++) {
-    //     //    clouds[count] = new Cloud();
-    // }
-    //scoreboard = new Scoreboard();
+    for (var count = 0; count < TREE_NUM; count++) {
+        trees[count] = new Tree(Math.random()* canvasW, GROUND_LEVEL, zOrder[count]);
+    }
+
+    lorn = new Lorn(200, GROUND_LEVEL - LORN_REG_Y);
+    cat = new Cat(canvasW, GROUND_LEVEL - CAT_REG_Y);
+
+    scoreboard = new Scoreboard();
 }
