@@ -1,5 +1,5 @@
 var CAT_MOVE = 8;
-
+var CAT_RELATIVE_VELOCITY = 4;
 
 // Cat Class
 
@@ -30,9 +30,11 @@ var Cat = (function () {
         stage.addChild(this.animation);
 	}
 
-	Cat.prototype.update = function () {
+
+	Cat.prototype.update = function (sense) {
 		
-		this.animation.x += -(CAT_MOVE);
+		this.animation.x += (-(sense)*CAT_RELATIVE_VELOCITY) - (CAT_MOVE);
+
 		if(this.animation.x < 0)
 			this.animation.x = canvasW;
 	}
