@@ -62,15 +62,15 @@ var Lorn = (function () {
     // set lorn for moving to the left
     Lorn.prototype.moveLeft = function (){
     	
+        lorn.animation.scaleX = -1;
     	this.movingLeft = true;
-		lorn.animation.scaleX = -1;
     }
 
     // set lorn for moving to the right
     Lorn.prototype.moveRight = function (){
 		
 		lorn.animation.scaleX = 1;
-    	this.movingRight += true;
+    	this.movingRight = true;
     }
 
     // set end of left move
@@ -93,7 +93,8 @@ var Lorn = (function () {
 
     // if lorn wasHitten, check lives and set hitten delay
     Lorn.prototype.wasHitten = function (){
-    	if(this.lives-- > 0){
+    	
+        if(this.lives-- > 0){
 
     		this.animation.alpha = 0.5;
     		this.hitten = true;
@@ -111,11 +112,13 @@ var Lorn = (function () {
 
     // check if lorn is not momving
     Lorn.prototype.isIdle = function (){
+        
         return (!this.movingLeft && !this.movingRight && !this.jumping);
     }
 
     Lorn.prototype.update = function () {
-    	// apply GRAVITY to vertical velocity
+    	
+        // apply GRAVITY to vertical velocity
     	this.velocityY +=GRAVITY;
     	// set lorn vertical position based on velocity
     	this.animation.y += this.velocityY;
@@ -131,10 +134,10 @@ var Lorn = (function () {
     		this.animation.gotoAndPlay("jump");
 
     	// verify and apply horizontal moves
-    	if(this.movingLeft && this.animation.x > this._width - 14)
-    		this.animation.x -= LORN_MOVE;
-    	if(this.movingRight && this.animation.x <= window.innerWidth - this._width + 14)
-    		this.animation.x += LORN_MOVE;
+    	// if(this.movingLeft && this.animation.x > this._width - 14)
+    	// 	this.animation.x -= LORN_MOVE;
+    	// if(this.movingRight && this.animation.x <= window.innerWidth - this._width + 14)
+    	// 	this.animation.x += LORN_MOVE;
 
     	if(this.isIdle())
     		this.animation.gotoAndPlay("idle");
