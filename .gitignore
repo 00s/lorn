@@ -2,3 +2,5 @@
 Script/filters/
 # ignore .ts files
 *.ts
+# ignore css files
+*.css
