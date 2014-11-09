@@ -19,8 +19,8 @@ var Tree = (function () {
 
 	}
 
-	Tree.prototype.move = function () {
-		this.image.x -= (this.parallax * this.PARALLAX_FACTOR);
+	Tree.prototype.move = function (sense) {
+		this.image.x -= sense*(this.parallax * this.PARALLAX_FACTOR);
 	}
 
 	return Tree;
