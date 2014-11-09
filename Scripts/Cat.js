@@ -1,3 +1,6 @@
+var CAT_MOVE = 8;
+
+
 // Cat Class
 
 var Cat = (function () {
