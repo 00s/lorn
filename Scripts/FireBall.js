@@ -1,3 +1,5 @@
+var FIREBALL_SPEED =  9
+
 // FireBall Class
 
 var FireBall = (function () {
@@ -18,8 +20,7 @@ var FireBall = (function () {
         };
 
         this.spriteSheet = new createjs.SpriteSheet(this.data);
-    	this.burnSprite = new createjs.Sprite(this.spriteSheet, "burn");
-        this.animation = this.burnSprite;
+        this.animation = new createjs.Sprite(this.spriteSheet, "burn");
 
 		// x and y params used for seting the object in stage
         this.animation.x = x;
@@ -36,10 +37,6 @@ var FireBall = (function () {
 		this.animation.x += (FIREBALL_SPEED * this.sense);
 	}
 
-    FireBall.prototype.dismiss  = function () {
-        stage.removeChild(fireballs[i].animation);
-        fireballs.pop(i);
-    }
 
 	return FireBall;
 })();

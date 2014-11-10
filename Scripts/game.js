@@ -2,10 +2,6 @@
 var queue;
 var canvas;
 
-// Game Objects
-var scoreboard;
-var lorn;
-
 // ENUM for keys
 Key = {
     UP : 38,
@@ -13,6 +9,11 @@ Key = {
     RIGHT : 39,
     SPACE : 32
 }
+
+// Game Objects
+var scoreboard;
+var lorn;
+var diamond;
 
 // Cloud Array
 var clouds = [];
@@ -23,21 +24,18 @@ var trees = [];
 // Cats Array
 var cats = [];
 
+
 // Game Constants
 var TREE_NUM = 11;
-var GAME_FONT = "40px Consolas";
-var FONT_COLOUR = "#FFFF00";
-var PLAYER_LIVES = 3;
-var GRAVITY  = 0.6;
+var CAT_NUM = 4;
+
 var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight) - 35;
-var FIREBALL_SPEED = 9;
-var LORN_MOVE = 6;
+var PARALLAX = 8;
 var LORN_REG_Y = 24;
 var CAT_REG_Y = 16;
-var CAT_NUM = 4;
 var TREE_REG_Y = 124;
-var RIGHT = 1;
-var LEFT = -1;
+//var RIGHT = 1;
+//var LEFT = -1;
 
 function preload() {
     queue = new createjs.LoadQueue();
@@ -50,7 +48,8 @@ function preload() {
         { id: "lorn", src: "images/lorn.png" },
         { id: "fireball", src: "images/fireball.png" },
         { id: "cat", src: "images/cat.png"},
-        { id: "tree", src: "images/tree.png"}
+        { id: "tree", src: "images/tree.png"},
+        { id: "diamond", src: "images/diamond.png"}
     ]);
 }
 
@@ -110,8 +109,12 @@ function handleKeyUp(event){
 			x = lorn.animation.x;
 			y = lorn.animation.y;
 
-			fireballs.push(new FireBall(x, y, lorn.getSense(false)));
-			stage.addChild(fireballs[fireballs.length - 1].animation);
+            if(lorn.hasFireBalls()){
+                console.log("lorn's shooted");
+			     fireballs.push(new FireBall(x, y, lorn.getSense(false)));
+                 lorn.shoot();
+			     stage.addChild(fireballs[fireballs.length - 1].animation);
+            }
 			break;
 
 		case Key.LEFT:
@@ -141,12 +144,14 @@ function gameLoop(event) {
                 dismissable = true;
             }
 
+            // check colision between fireballs and cats
             for (var count = 0; count < CAT_NUM; count++) {
                 var cat = cats[count];
                 if(rectCollisionDetection(fireballs[i], cat)){
                     cat.randomizeCatDrop();
                     dismissable = true;
-                    console.log("fireball on target");
+                    lorn.hitCat();
+                    console.log("fireball has hitten a poor cat");
                 }
             }
             if(dismissable)
@@ -177,11 +182,21 @@ function gameLoop(event) {
     }
 
     lorn.update();
+
+    diamond.update(lorn.getSense(true), PARALLAX);
     
+    if(rectCollisionDetection(lorn, diamond)){
+        lorn.colectDiamond();
+        diamond.redefinePosition();
+    }
+
     for (var count = 0; count < CAT_NUM; count++) {
         cats[count].update(lorn.getSense(true));
     }
-    scoreboard.update;
+
+    // get player status and update scoreboard screen
+    scoreboard.update(lorn.toString());
+    
     stage.update();
 }
 
@@ -228,42 +243,16 @@ function rectCollisionDetection(obj, target){
 }
 
 
-var Scoreboard = (function () {
-    function Scoreboard() {
-        this.labelString = "";
-        this.lives = PLAYER_LIVES;
-        this.score = 0;
-        this.label = new createjs.Text(this.labelString, GAME_FONT, FONT_COLOUR);
-        this.update();
-        this.width = this.label.getBounds().width;
-        this.height = this.label.getBounds().height;
-
-        stage.addChild(this.label);
-    }
-    Scoreboard.prototype.update = function () {
-        this.labelString = "Lives: " + this.lives.toString() + " Score: " + this.score.toString();
-        this.label.text = this.labelString;
-    };
-    return Scoreboard;
-})();
-
 // Main Game Function
 function gameStart() {
-    //var point1 = new createjs.Point();
-    //var point2 = new createjs.Point();
-
-    // ocean = new Ocean();
-    //island = new Island();
-    //plane = new Plane();
-    //tree = new Tree(canvasW -100, GROUND_LEVEL, 0.5);
-    //fireballs = new createjs.Container();
+    
 
 
     var zOrder = [];
     // randomize values for parallax effect
     for (var count = 0; count < TREE_NUM; count++) {
 
-        zOrder.push((Math.random() - 0.5)+0.7);
+        zOrder.push((Math.random() - 0.4)+0.7);
     }
         // sort results for setting up trees order
         zOrder.sort();
@@ -277,6 +266,8 @@ function gameStart() {
     }
 
     lorn = new Lorn(canvasW * 0.5, GROUND_LEVEL - LORN_REG_Y);
+
+    diamond = new Diamond(canvasW + 30, GROUND_LEVEL - LORN_REG_Y);
 
     for (var count = 0; count < CAT_NUM; count++) {
 

@@ -1,4 +1,19 @@
 var RECOVERING_TIME = 750;
+var DISTANCE_PER_MOVE = 10;
+var HIT_CAT_SCORE = 50;
+var GRAVITY  = 0.6;
+
+if (!String.format) {
+  String.format = function(format) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return format.replace(/{(\d+)}/g, function(match, number) { 
+      return typeof args[number] != 'undefined'
+        ? args[number] 
+        : match
+      ;
+    });
+  };
+}
 
 // lorn Character
 var Lorn = (function () {
@@ -8,9 +23,14 @@ var Lorn = (function () {
     	this.jumping , this.movingLeft , this.movingRight = false;
         this.velocityY = 0.0;
 
-        // live and blink
+        // PLAYER STATUS ATTRIBUTES
+        this.coveredDistance = 0;
+        this.score = 0;
         this.lives = 3;
-        //this.hitten = false;
+
+        // Diamonds and Fireballs
+        this.fireballs = 0;
+        this.diamonds = 0;
 
         // sprite size reference
         this._width  = 28;
@@ -37,7 +57,30 @@ var Lorn = (function () {
 
         stage.addChild(this.animation);
     }
+
+    Lorn.prototype.hasFireBalls = function () {
+        return (this.fireballs > 0)
+    }
+
+    Lorn.prototype.shoot = function () {
+        this.fireballs--;
+    }
+
+    // return Lives, distance, score, fireballs, diamonds
+    Lorn.prototype.getPlayerStatus = function () {
+        var status = [""+this.lives, ""+this.coveredDistance , ""+this.score, ""+this.fireballs, ""+this.diamonds];
+        return status;
+    }
+
+    Lorn.prototype.toString = function () {
+        var status = this.getPlayerStatus();
+        return String.format("\nLIVES: \t\t\t\t{0}\n\nFIREBALLS: {1}\n\nSCORE: \t\t\t\t{2}\n\nDIAMONDS: \t{3}\n\nDISTANCE: \t{4}",status[0],status[3],status[2],status[4],status[1]);
+    }
     
+
+    Lorn.prototype.hitCat = function () {
+        this.score += HIT_CAT_SCORE;
+    }
 
     // set lorn for jumping
     Lorn.prototype.startJump = function () {
@@ -116,6 +159,11 @@ var Lorn = (function () {
         return (!this.movingLeft && !this.movingRight && !this.jumping);
     }
 
+    Lorn.prototype.colectDiamond = function (){
+        this.diamonds++;
+        this.fireballs += 10;
+    }
+
     Lorn.prototype.update = function () {
     	
         // apply GRAVITY to vertical velocity
@@ -133,11 +181,11 @@ var Lorn = (function () {
     	if(this.jumping)
     		this.animation.gotoAndPlay("jump");
 
-    	// verify and apply horizontal moves
-    	// if(this.movingLeft && this.animation.x > this._width - 14)
-    	// 	this.animation.x -= LORN_MOVE;
-    	// if(this.movingRight && this.animation.x <= window.innerWidth - this._width + 14)
-    	// 	this.animation.x += LORN_MOVE;
+    	// verify and calculate horizontal moves
+    	if(this.movingLeft)
+    	   	this.coveredDistance -= DISTANCE_PER_MOVE;
+    	if(this.movingRight)
+    	 	this.coveredDistance += DISTANCE_PER_MOVE;
 
     	if(this.isIdle())
     		this.animation.gotoAndPlay("idle");
