@@ -48,7 +48,7 @@ function preload() {
     queue.installPlugin(createjs.Sound);
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "yay", src: "sounds/yay.ogg" },
+        { id: "diamond-song", src: "sounds/Lorn-Diamond.mp3" },
         { id: "thunder", src: "sounds/thunder.ogg" },
         { id: "engine", src: "sounds/engine.ogg" },
         { id: "lorn", src: "images/lorn.png" },
@@ -67,6 +67,10 @@ function init() {
     canvas.height = GROUND_LEVEL; //document.height is obsolete
     canvasW = canvas.width;
     canvasH = canvas.height;
+
+    var instance = createjs.Sound.play("diamond-song");  // play using id.  Could also use full source path or event.src.
+    instance.addEventListener("complete", createjs.proxy(this.handleComplete, this));
+    instance.volume = 0.1;
 
     // handlers for keyboard inputs
     window.addEventListener( "keydown", handleKeyDown, false );
