@@ -1,4 +1,5 @@
-var FIREBALL_SPEED =  9
+var FIREBALL_MOVE =  9
+var FIREBALL_RELATIVE_X_VELOCITY = 4;
 
 // FireBall Class
 
@@ -32,9 +33,10 @@ var FireBall = (function () {
         	this.animation.scaleX = sense;
 	}
 
-	FireBall.prototype.update = function () {
-		
-		this.animation.x += (FIREBALL_SPEED * this.sense);
+    // apply fireball movement based on lorn inertial reference
+	FireBall.prototype.update = function (inertia) {
+
+	   this.animation.x += (FIREBALL_MOVE * this.sense) + (inertia*-1) * FIREBALL_RELATIVE_X_VELOCITY;
 	}
 
 

@@ -135,7 +135,7 @@ function gameLoop(event) {
 	// update each fireball on stage and remove from stage the ones that are out of view.
     for (i = 0; i < fireballs.length; i++) {
     	if(fireballs[i] !== undefined){
-    		fireballs[i].update();
+    		fireballs[i].update(lorn.getSense());
 
             var dismissable = false;
             
@@ -196,7 +196,7 @@ function gameLoop(event) {
 
     // get player status and update scoreboard screen
     scoreboard.update(lorn.toString());
-    
+
     stage.update();
 }
 
