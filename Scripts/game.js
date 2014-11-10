@@ -268,41 +268,42 @@ function updateFireBalls(){
 
 function handleKeyDown(event){
 
-	switch(event.keyCode){
-		
-		case Key.UP:
-			console.log("Key.UP pressed");
-			lorn.startJump();
-			break;
+    if(state == Game.PLAYING)
+    	switch(event.keyCode){
+    		
+    		case Key.UP:
+    			console.log("Key.UP pressed");
+    			lorn.startJump();
+    			break;
 
-		case Key.LEFT:
-			console.log("Key.LEFT pressed");
-			lorn.moveLeft();
-			break;
+    		case Key.LEFT:
+    			console.log("Key.LEFT pressed");
+    			lorn.moveLeft();
+    			break;
 
-		case Key.RIGHT:
-			console.log("Key.RIGHT pressed");
-			lorn.moveRight();
-			break;
+    		case Key.RIGHT:
+    			console.log("Key.RIGHT pressed");
+    			lorn.moveRight();
+    			break;
 
-        case Key.I:
-            // volume down
-            soundtrack.volume -= 0.05;
-            break;
+            case Key.I:
+                // volume down
+                soundtrack.volume -= 0.05;
+                break;
 
-        case Key.O:
-            // volume up
-            soundtrack.volume += 0.05;
-            break;
+            case Key.O:
+                // volume up
+                soundtrack.volume += 0.05;
+                break;
 
-        case Key.M:
-            soundtrack.setMute(!soundtrack.getMute());
-            break;
+            case Key.M:
+                soundtrack.setMute(!soundtrack.getMute());
+                break;
 
-        case Key.P:
+            case Key.P:
 
-            break;
-	}
+                break;
+    	}
 }
 
 function handleKeyUp(event){
