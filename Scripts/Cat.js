@@ -26,15 +26,13 @@ var Cat = (function () {
         this.spriteSheet = new createjs.SpriteSheet(this.data);
         this.animation = new createjs.Sprite(this.spriteSheet, "walk");
 		
-		// x and y params used for seting the object in stage
-
         stage.addChild(this.animation);
-		//this.randomizeCatDrop();
+		this.randomizeCatDrop();
 
 	}
 
 	Cat.prototype.randomizeCatDrop = function (){
-		this.animation.x = canvasW + Math.random()+ 250;
+		this.animation.x = canvasW + Math.random()* 100;
 		this.animation.y = (canvasH - CAT_REG_Y) * Math.random();
 		this.vertical_velocity = Math.floor(Math.random() * 3)+3;
 		this.onGroundLevel = false;

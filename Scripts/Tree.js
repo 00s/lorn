@@ -1,14 +1,17 @@
+var BLUR_AMOUNT = 20;
+var BLUR_RADIUS = 1;
+
 var Tree = (function () {
 	function Tree (x, y, parallax) {
 
-		this.PARALLAX_FACTOR = 4.5;
+		this.PARALLAX_FACTOR = 8;
 		this.parallax = parallax;
 
         this.image = new createjs.Bitmap(queue.getResult("tree"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
 
-        var blur = new createjs.BlurFilter((1.2 - parallax) *15,(1.2 - parallax) *15,0.5);
+        var blur = new createjs.BlurFilter((1.2 - parallax) *BLUR_AMOUNT,(1.2 - parallax) *BLUR_AMOUNT,BLUR_RADIUS);
         this.image.filters = [blur];
 
         this.image.cache(0,0,this.width, this.height);
