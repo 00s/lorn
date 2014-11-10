@@ -119,7 +119,9 @@ function gameLoop(event) {
 }
 
 function playing(){
-    updateFireBalls();
+    
+    if(lorn.lives <= 0)
+        state = Game.OVER;
 
     if(!lorn.hitten)
         for (var count = 0; count < CAT_NUM; count++) {
@@ -129,21 +131,9 @@ function playing(){
             }
         }
 
-    for(var count = 0 ; count < TREE_NUM ; count++){
-        var tree = trees[count];
-        tree.move(lorn.getSense(true));
-        
-        // reuse trees when they are out of the bounds
-        if(tree.image.x < -(canvasW * 0.5)){
-            tree.image.x = canvasW + canvasW * 0.25;
-        }
-        if(tree.image.x > canvasW + canvasW * 0.5){
-            tree.image.x = -(canvasW * 0.25)
-        }
-
-    }
-
+    updateTrees();
     lorn.update();
+    updateFireBalls();
 
     diamond.update(lorn.getSense(true), PARALLAX);
     
@@ -159,8 +149,22 @@ function playing(){
     // get player status and update scoreboard screen
     scoreboard.update(lorn.toString());
 
-    if(lorn.lives <= 0)
-        state = Game.OVER;
+}
+
+function updateTrees(){
+    
+    for(var count = 0 ; count < TREE_NUM ; count++){
+        var tree = trees[count];
+        tree.move(lorn.getSense(true));
+        
+        // reuse trees when they are out of the bounds
+        if(tree.image.x < -(canvasW * 0.5)){
+            tree.image.x = canvasW + canvasW * 0.25;
+        }
+        if(tree.image.x > canvasW + canvasW * 0.5){
+            tree.image.x = -(canvasW * 0.25)
+        }
+    }
 }
 
 function updateFireBalls(){
@@ -266,13 +270,16 @@ function dismiss(obj, list, index){
 var AnimationBorder = (function(){
     function AnimationBorder(obj){
 
+        // used to reduced the final area (in pixels)
+        var CORRECTION = 2;
+
         var objW = obj._width;
         var objH = obj._height;
         
-        this.leftBound = obj.animation.x - (objW * 0.5);
-        this.rightBound = this.leftBound + objW;
-        this.topBound = obj.animation.y - (objH * 0.5);
-        this.bottomBound = this.topBound + objH;
+        this.leftBound      = (obj.animation.x - (objW * 0.5))      + CORRECTION;
+        this.rightBound     = (this.leftBound + objW)               - CORRECTION;
+        this.topBound       = (obj.animation.y - (objH * 0.5))      + CORRECTION;
+        this.bottomBound    = (this.topBound + objH)                - CORRECTION;
         
     }
 
