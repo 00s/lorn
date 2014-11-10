@@ -9,6 +9,12 @@ Key = {
     RIGHT : 39,
     SPACE : 32
 }
+// ENUM GAME STATUS
+Game = {
+    HOME : 0,
+    PLAYING : 1,
+    OVER : 2
+}
 
 // Game Objects
 var scoreboard;
@@ -72,6 +78,86 @@ function init() {
     gameStart();
 }
 
+
+// Game Loop
+function gameLoop(event) {
+
+    playing();
+
+    stage.update();
+}
+
+function playing(){
+    updateFireBalls();
+
+    if(!lorn.hitten)
+        for (var count = 0; count < CAT_NUM; count++) {
+            if(rectCollisionDetection(lorn, cats[count])){
+                lorn.wasHitten();
+                console.log("Lorn lives: " + lorn.lives);
+            }
+        }
+
+    for(var count = 0 ; count < TREE_NUM ; count++){
+        var tree = trees[count];
+        tree.move(lorn.getSense(true));
+        
+        // reuse trees when they are out of the bounds
+        if(tree.image.x < -(canvasW * 0.5)){
+            tree.image.x = canvasW + canvasW * 0.25;
+        }
+        if(tree.image.x > canvasW + canvasW * 0.5){
+            tree.image.x = -(canvasW * 0.25)
+        }
+
+    }
+
+    lorn.update();
+
+    diamond.update(lorn.getSense(true), PARALLAX);
+    
+    if(rectCollisionDetection(lorn, diamond)){
+        lorn.colectDiamond();
+        diamond.redefinePosition();
+    }
+
+    for (var count = 0; count < CAT_NUM; count++) {
+        cats[count].update(lorn.getSense(true));
+    }
+
+    // get player status and update scoreboard screen
+    scoreboard.update(lorn.toString());
+}
+
+function updateFireBalls(){
+    // update each fireball on stage and remove from stage the ones that are out of view.
+    for (i = 0; i < fireballs.length; i++) {
+        if(fireballs[i] !== undefined){
+            fireballs[i].update(lorn.getSense());
+
+            var dismissable = false;
+            
+            if(fireballs[i].animation.x > canvasW || fireballs[i].animation.x < 0){
+                dismiss(fireballs[i], fireballs, i);
+                dismissable = true;
+            }
+
+            // check colision between fireballs and cats
+            for (var count = 0; count < CAT_NUM; count++) {
+                var cat = cats[count];
+                if(rectCollisionDetection(fireballs[i], cat)){
+                    cat.randomizeCatDrop();
+                    dismissable = true;
+                    lorn.hitCat();
+                    console.log("fireball has hitten a poor cat");
+                }
+            }
+            if(dismissable)
+                dismiss(fireballs[i], fireballs, i);
+        }
+    }
+}
+
 // Keyboard handlers
 
 function handleKeyDown(event){
@@ -127,77 +213,6 @@ function handleKeyUp(event){
 			lorn.stopMovingRight();
 			break;
 	}
-}
-
-// Game Loop
-function gameLoop(event) {
-
-	// update each fireball on stage and remove from stage the ones that are out of view.
-    for (i = 0; i < fireballs.length; i++) {
-    	if(fireballs[i] !== undefined){
-    		fireballs[i].update(lorn.getSense());
-
-            var dismissable = false;
-            
-            if(fireballs[i].animation.x > canvasW || fireballs[i].animation.x < 0){
-                dismiss(fireballs[i], fireballs, i);
-                dismissable = true;
-            }
-
-            // check colision between fireballs and cats
-            for (var count = 0; count < CAT_NUM; count++) {
-                var cat = cats[count];
-                if(rectCollisionDetection(fireballs[i], cat)){
-                    cat.randomizeCatDrop();
-                    dismissable = true;
-                    lorn.hitCat();
-                    console.log("fireball has hitten a poor cat");
-                }
-            }
-            if(dismissable)
-                dismiss(fireballs[i], fireballs, i);
-    	}
-	}
-
-    if(!lorn.hitten)
-        for (var count = 0; count < CAT_NUM; count++) {
-            if(rectCollisionDetection(lorn, cats[count])){
-                lorn.wasHitten();
-                console.log("Lorn lives: " + lorn.lives);
-            }
-        }
-
-    for(var count = 0 ; count < TREE_NUM ; count++){
-        var tree = trees[count];
-        tree.move(lorn.getSense(true));
-        
-        // reuse trees when they are out of the bounds
-        if(tree.image.x < -(canvasW * 0.5)){
-            tree.image.x = canvasW + canvasW * 0.25;
-        }
-        if(tree.image.x > canvasW + canvasW * 0.5){
-            tree.image.x = -(canvasW * 0.25)
-        }
-
-    }
-
-    lorn.update();
-
-    diamond.update(lorn.getSense(true), PARALLAX);
-    
-    if(rectCollisionDetection(lorn, diamond)){
-        lorn.colectDiamond();
-        diamond.redefinePosition();
-    }
-
-    for (var count = 0; count < CAT_NUM; count++) {
-        cats[count].update(lorn.getSense(true));
-    }
-
-    // get player status and update scoreboard screen
-    scoreboard.update(lorn.toString());
-
-    stage.update();
 }
 
 // auxiliar function for removing object from list and animation from stage

@@ -1,4 +1,4 @@
-var CAT_MOVE = 8;
+var CAT_MOVE = -9;
 var CAT_RELATIVE_X_VELOCITY = 4;
 var CAT_REG_Y = 16;
 
@@ -39,10 +39,14 @@ var Cat = (function () {
 	}
 
 
-	Cat.prototype.update = function (sense) {
+	Cat.prototype.update = function (inertia) {
 		
-		this.animation.x += (-(sense)*CAT_RELATIVE_X_VELOCITY) - (CAT_MOVE);
-
+		this.animation.x += (CAT_MOVE);// + (inertia*CAT_RELATIVE_X_VELOCITY);
+		if(inertia > 0){
+			this.animation.x += CAT_MOVE;
+		}if(inertia < 0){
+			this.animation.x += CAT_MOVE*-0.7;
+		}
 		if(!this.onGroundLevel){
 			if(this.animation.y < canvasH - CAT_REG_Y){
 				this.animation.y +=this.vertical_velocity;
