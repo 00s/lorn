@@ -7,7 +7,11 @@ Key = {
     UP : 38,
     LEFT : 37,
     RIGHT : 39,
-    SPACE : 32
+    SPACE : 32,
+    P: 80,
+    I: 73,
+    O:79,
+    M: 77
 }
 // ENUM GAME STATE
 Game = {
@@ -21,6 +25,9 @@ var state;
 
 // gameOver obj
 var endMessage
+
+// soundtrack
+var soundtrack;
 
 // Game Objects
 var scoreboard;
@@ -73,9 +80,10 @@ function init() {
     canvasW = canvas.width;
     canvasH = canvas.height;
 
-    var instance = createjs.Sound.play("diamond-song");  // play using id.  Could also use full source path or event.src.
-    instance.addEventListener("complete", createjs.proxy(this.handleComplete, this));
-    instance.volume = 0.1;
+    // game soundtrack
+    soundtrack = createjs.Sound.play("diamond-song"); 
+    soundtrack.addEventListener("complete", createjs.proxy(this.handleComplete, this));
+    soundtrack.volume = 0.1;
 
     // handlers for keyboard inputs
     window.addEventListener( "keydown", handleKeyDown, false );
@@ -102,7 +110,7 @@ function gameLoop(event) {
             // gameover
             stage.clear();
             stage.removeAllChildren();
-            
+            soundtrack.stop();
             fireballs = [];
             trees = [];
             cats = [];
@@ -216,6 +224,24 @@ function handleKeyDown(event){
 			console.log("Key.RIGHT pressed");
 			lorn.moveRight();
 			break;
+
+        case Key.I:
+            // volume down
+            soundtrack.volume -= 0.05;
+            break;
+
+        case Key.O:
+            // volume up
+            soundtrack.volume += 0.05;
+            break;
+
+        case Key.M:
+            soundtrack.setMute(!soundtrack.getMute());
+            break;
+
+        case Key.P:
+
+            break;
 	}
 }
 
@@ -271,7 +297,7 @@ var AnimationBorder = (function(){
     function AnimationBorder(obj){
 
         // used to reduced the final area (in pixels)
-        var CORRECTION = 2;
+        var CORRECTION = 3;
 
         var objW = obj._width;
         var objH = obj._height;
