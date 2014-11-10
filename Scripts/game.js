@@ -53,7 +53,7 @@ function preload() {
     queue.installPlugin(createjs.Sound);
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "diamond-song", src: "sounds/Lorn-Diamond.mp3" },
+        { id: "diamond-song", src: "sounds/Lorn-Diamond.ogg" },
         { id: "thunder", src: "sounds/thunder.ogg" },
         { id: "engine", src: "sounds/engine.ogg" },
         { id: "lorn", src: "images/lorn.png" },
