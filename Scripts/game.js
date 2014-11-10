@@ -9,20 +9,25 @@ Key = {
     RIGHT : 39,
     SPACE : 32
 }
-// ENUM GAME STATUS
+// ENUM GAME STATE
 Game = {
     HOME : 0,
     PLAYING : 1,
     OVER : 2
 }
 
+// Game state
+var state;
+
+// gameOver obj
+var endMessage
+
 // Game Objects
 var scoreboard;
 var lorn;
 var diamond;
 
-// Cloud Array
-var clouds = [];
+
 // FireBall Array
 var fireballs = [];
 // Tree Array
@@ -79,6 +84,7 @@ function init() {
     //stage.enableMouseOver(20);
     createjs.Ticker.setFPS(40);
     createjs.Ticker.addEventListener("tick", gameLoop);
+    state = Game.PLAYING;
     gameStart();
 }
 
@@ -86,7 +92,28 @@ function init() {
 // Game Loop
 function gameLoop(event) {
 
-    playing();
+    switch(state){
+     
+        case Game.PLAYING:
+            playing();
+            break;
+
+        case Game.OVER:
+            // gameover
+            stage.clear();
+            stage.removeAllChildren();
+            
+            fireballs = [];
+            trees = [];
+            cats = [];
+            lorn = null;
+
+            endMessage = new Scoreboard("\t\t\t\t\t\t\tGAME OVER\n\n\n\n\npress space to restart");
+            endMessage.label.x = canvasW * 0.45;
+            endMessage.label.y = canvasH * 0.5;
+            stage.addChild(scoreboard);
+            break;
+    }
 
     stage.update();
 }
@@ -131,6 +158,9 @@ function playing(){
 
     // get player status and update scoreboard screen
     scoreboard.update(lorn.toString());
+
+    if(lorn.lives <= 0)
+        state = Game.OVER;
 }
 
 function updateFireBalls(){
@@ -195,6 +225,13 @@ function handleKeyUp(event){
 			break;
 
 		case Key.SPACE:
+
+            // RESTART GAME if state is Game.OVER
+            if(state == Game.OVER){
+                state = Game.PLAYING;
+                init();
+            }
+
 			console.log("Key.SPACE released");
 			x = lorn.animation.x;
 			y = lorn.animation.y;
@@ -293,5 +330,5 @@ function gameStart() {
         cats.push(new Cat());
     }
 
-    scoreboard = new Scoreboard();
+    scoreboard = new Scoreboard(".");
 }

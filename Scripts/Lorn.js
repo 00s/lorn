@@ -138,7 +138,7 @@ var Lorn = (function () {
     }
 
     // if lorn wasHitten, check lives and set hitten delay
-    Lorn.prototype.wasHitten = function (){
+    Lorn.prototype.wasHitten = function (state){
     	
         if(this.lives-- > 0){
 
@@ -152,7 +152,7 @@ var Lorn = (function () {
     			console.log("back to the game with " + _this.lives+ " lives.")
     		}, RECOVERING_TIME);
     	}else{
-    		// GAME OVER
+    		// state = Game.OVER;
     	}
     }
 

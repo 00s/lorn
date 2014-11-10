@@ -3,14 +3,15 @@ var FONT_COLOUR = "#fff";
 // Scoreboard Class
 
 var Scoreboard = (function () {
-    function Scoreboard() {
-        this.labelString = "";
+    function Scoreboard(initialText) {
+        this.labelString = initialText;
         this.label = new createjs.Text(this.labelString, GAME_FONT, FONT_COLOUR);
-        this.update(".");
+        this.update(this.labelString);
 
         this.label.x = 15;
         stage.addChild(this.label);
     }
+
     Scoreboard.prototype.update = function (text) {
         
         this.labelString = text;
