@@ -70,7 +70,7 @@ function preload() {
     queue.addEventListener("loadstart", loading);
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "diamond-song", src: "sounds/Lorn-Diamond.ogg" },
+        { id: "diamond-song", src: "sounds/Lorn-Diamond.mp3" },
         { id: "thunder", src: "sounds/thunder.ogg" },
         { id: "engine", src: "sounds/engine.ogg" },
         { id: "lorn", src: "images/lorn.png" },
