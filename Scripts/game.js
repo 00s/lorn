@@ -1,4 +1,6 @@
-﻿var stage;
+﻿// © 
+
+var stage;
 var queue;
 var canvas;
 
@@ -23,6 +25,12 @@ Game = {
 // Game state
 var state;
 
+//controls
+var controls
+
+// reference for Instructions
+var dejavu = false;
+
 // gameOver obj
 var endMessage
 
@@ -30,7 +38,7 @@ var endMessage
 var soundtrack;
 
 // Game Objects
-var scoreboard;
+var display;
 var lorn;
 var diamond;
 
@@ -52,12 +60,14 @@ var PARALLAX = 8;
 var LORN_REG_Y = 24;
 var CAT_REG_Y = 16;
 var TREE_REG_Y = 124;
-//var RIGHT = 1;
-//var LEFT = -1;
+var GAME_FONT = "VT323";
+var FONT_SIZE = 22;
+var FONT_COLOUR = "white";
 
 function preload() {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
+    queue.addEventListener("loadstart", loading);
     queue.addEventListener("complete", init);
     queue.loadManifest([
         { id: "diamond-song", src: "sounds/Lorn-Diamond.ogg" },
@@ -67,11 +77,13 @@ function preload() {
         { id: "fireball", src: "images/fireball.png" },
         { id: "cat", src: "images/cat.png"},
         { id: "tree", src: "images/tree.png"},
-        { id: "diamond", src: "images/diamond.png"}
+        { id: "diamond", src: "images/diamond.png"},
+        { id: "brand", src: "images/gamebrand.png"},
+        { id: "controls", src: "images/controls.png"}
     ]);
 }
 
-function init() {
+function loading(){
     stage = new createjs.Stage(document.getElementById("canvas"));
     canvas = document.getElementById("canvas");
 
@@ -79,9 +91,14 @@ function init() {
     canvas.height = GROUND_LEVEL; //document.height is obsolete
     canvasW = canvas.width;
     canvasH = canvas.height;
+    stage.addChild(new Display(". . .", 90, GAME_FONT, FONT_COLOUR, canvasW * 0.45, canvasH * 0.5));
+}
 
+function init() {
+    stage.removeAllChildren();
     // game soundtrack
     soundtrack = createjs.Sound.play("diamond-song"); 
+    soundtrack.stop();
     soundtrack.addEventListener("complete", createjs.proxy(this.handleComplete, this));
     soundtrack.volume = 0.1;
 
@@ -92,41 +109,67 @@ function init() {
     //stage.enableMouseOver(20);
     createjs.Ticker.setFPS(40);
     createjs.Ticker.addEventListener("tick", gameLoop);
-    state = Game.PLAYING;
-    gameStart();
+
+    //gameStart();
+    state = Game.HOME;
+    
 }
 
 
 // Game Loop
 function gameLoop(event) {
 
+    // switches between game states
     switch(state){
+
+        case Game.HOME:
+            homeScreen();
+            break;
      
         case Game.PLAYING:
             playing();
             break;
 
         case Game.OVER:
-            // gameover
-            stage.clear();
-            stage.removeAllChildren();
-            soundtrack.stop();
-            fireballs = [];
-            trees = [];
-            cats = [];
-            lorn = null;
-
-            endMessage = new Scoreboard("\t\t\t\t\t\t\tGAME OVER\n\n\n\n\npress space to restart");
-            endMessage.label.x = canvasW * 0.45;
-            endMessage.label.y = canvasH * 0.5;
-            stage.addChild(scoreboard);
+            gameover();
             break;
     }
 
     stage.update();
 }
 
+function getCentralizedBitmap(idOrUrl){
+    var bit = new createjs.Bitmap(queue.getResult(idOrUrl));
+    bit.regX = bit.getBounds().width * 0.5;
+    bit.regY = bit.getBounds().height * 0.5;
+    bit.x = canvasW * 0.5;
+    bit.y = canvasH * 0.5;
+    return bit;
+}
+
+function homeScreen () {
+    stage.clear();
+    var brand = getCentralizedBitmap("brand");
+    stage.addChild(brand);
+}
+
+function presentControls(){
+    
+    if(!this.dejavu){
+
+        controls = getCentralizedBitmap("controls");
+        controls.y = canvasW * 0.10;
+        stage.addChild(controls);
+
+        setTimeout(function(){
+            stage.removeChild(controls);
+            this.dejavu = true;
+        }, 5000);
+    }
+}
+
 function playing(){
+
     
     if(lorn.lives <= 0)
         state = Game.OVER;
@@ -154,11 +197,28 @@ function playing(){
         cats[count].update(lorn.getSense(true));
     }
 
-    // get player status and update scoreboard screen
-    scoreboard.update(lorn.toString());
-
+    // get player status and update display screen
+    display.update(lorn.toString());
 }
 
+function gameover() {
+    // gameover
+    lastStatus = lorn.getTotalScore();
+    lastStatus = (lastStatus > 0) ? lastStatus : 0;
+
+    stage.clear();
+
+    stage.removeAllChildren();
+    soundtrack.stop();
+    fireballs = [];
+    trees = [];
+    cats = [];
+
+    var gameoverMsg = new Display("GAME OVER", 90, "VT323", "white", canvasW * 0.5, canvasH *0.2);
+    var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.5);
+    var reminder = endMessage = new Display("press space to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
+    
+}
 function updateTrees(){
     
     for(var count = 0 ; count < TREE_NUM ; count++){
@@ -247,43 +307,53 @@ function handleKeyDown(event){
 
 function handleKeyUp(event){
 
-	switch(event.keyCode){
-		
-		case Key.UP:
-			console.log("Key.UP released");
-			lorn.endJump();
-			break;
+    if(state == Game.HOME){
+    
+        state = Game.PLAYING;
+        gameStart();
+    
+    }else{
 
-		case Key.SPACE:
+    	switch(event.keyCode){
+    		
+    		case Key.UP:
+    			console.log("Key.UP released");
+    			lorn.endJump();
+    			break;
 
-            // RESTART GAME if state is Game.OVER
-            if(state == Game.OVER){
-                state = Game.PLAYING;
-                init();
-            }
+    		case Key.SPACE:
 
-			console.log("Key.SPACE released");
-			x = lorn.animation.x;
-			y = lorn.animation.y;
+                // RESTART GAME if state is Game.OVER
+                if(state == Game.OVER){
+                    state = Game.PLAYING;
+                    gameStart();
+                    //init();
+                }
 
-            if(lorn.hasFireBalls()){
-                console.log("lorn's shooted");
-			     fireballs.push(new FireBall(x, y, lorn.getSense(false)));
-                 lorn.shoot();
-			     stage.addChild(fireballs[fireballs.length - 1].animation);
-            }
-			break;
+    			console.log("Key.SPACE released");
+    			x = lorn.animation.x;
+    			y = lorn.animation.y;
 
-		case Key.LEFT:
-			console.log("Key.LEFT released");
-			lorn.stopMovingLeft();
-			break;
+                if(lorn.hasFireBalls()){
+                    console.log("lorn's shooted");
+    			     fireballs.push(new FireBall(x, y, lorn.getSense(false)));
+                     lorn.shoot();
+    			     stage.addChild(fireballs[fireballs.length - 1].animation);
+                }
+    			break;
 
-		case Key.RIGHT:
-			console.log("Key.RIGHT released");
-			lorn.stopMovingRight();
-			break;
-	}
+    		case Key.LEFT:
+    			console.log("Key.LEFT released");
+    			lorn.stopMovingLeft();
+    			break;
+
+    		case Key.RIGHT:
+    			console.log("Key.RIGHT released");
+    			lorn.stopMovingRight();
+    			break;
+    	}
+
+    }
 }
 
 // auxiliar function for removing object from list and animation from stage
@@ -336,6 +406,10 @@ function rectCollisionDetection(obj, target){
 function gameStart() {
     
 
+    stage.clear();
+    stage.removeAllChildren();
+    soundtrack.play();
+    presentControls();
 
     var zOrder = [];
     // randomize values for parallax effect
@@ -363,5 +437,5 @@ function gameStart() {
         cats.push(new Cat());
     }
 
-    scoreboard = new Scoreboard(".");
+    display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
 }

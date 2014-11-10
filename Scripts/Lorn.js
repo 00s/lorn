@@ -2,6 +2,7 @@ var RECOVERING_TIME = 750;
 var DISTANCE_PER_MOVE = 10;
 var HIT_CAT_SCORE = 50;
 var GRAVITY  = 0.6;
+var LIVES = 3;
 
 
 // Auxiliar function for String Formating. 
@@ -29,7 +30,7 @@ var Lorn = (function () {
         // PLAYER STATUS ATTRIBUTES
         this.coveredDistance = 0;
         this.score = 0;
-        this.lives = 3;
+        this.lives = LIVES;
 
         // Diamonds and Fireballs
         this.fireballs = 0;
@@ -149,7 +150,7 @@ var Lorn = (function () {
     		setTimeout( function(){
     			_this.animation.alpha = 1.0;
     			_this.hitten = false;
-    			console.log("back to the game with " + _this.lives+ " lives.")
+    			console.log("back to the game with " + _this.lives + " lives.")
     		}, RECOVERING_TIME);
     	}else{
     		// state = Game.OVER;
@@ -168,7 +169,7 @@ var Lorn = (function () {
     }
 
     Lorn.prototype.getTotalScore = function (){
-        return this.distance * 0.1 * this.score;
+        return this.coveredDistance * 0.1 + this.score;
     }
 
     Lorn.prototype.update = function () {
