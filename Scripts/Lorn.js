@@ -3,6 +3,9 @@ var DISTANCE_PER_MOVE = 10;
 var HIT_CAT_SCORE = 50;
 var GRAVITY  = 0.6;
 
+
+// Auxiliar function for String Formating. 
+// src: http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
 if (!String.format) {
   String.format = function(format) {
     var args = Array.prototype.slice.call(arguments, 1);
@@ -162,6 +165,10 @@ var Lorn = (function () {
     Lorn.prototype.colectDiamond = function (){
         this.diamonds++;
         this.fireballs += 10;
+    }
+
+    Lorn.prototype.getTotalScore = function (){
+        return this.distance * 0.1 * this.score;
     }
 
     Lorn.prototype.update = function () {
