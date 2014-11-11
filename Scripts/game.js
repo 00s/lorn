@@ -1,4 +1,5 @@
 ﻿// © 
+var DEBUG = false;
 
 var stage;
 var queue;
@@ -178,7 +179,7 @@ function playing(){
         for (var count = 0; count < CAT_NUM; count++) {
             if(rectCollisionDetection(lorn, cats[count])){
                 lorn.wasHitten();
-                console.log("Lorn lives: " + lorn.lives);
+                log("Lorn lives: " + lorn.lives);
             }
         }
 
@@ -238,12 +239,12 @@ function updateTrees(){
 function updateFireBalls(){
     // update each fireball on stage and remove from stage the ones that are out of view.
     for (i = 0; i < fireballs.length; i++) {
-        if(fireballs[i] !== undefined){
+        if(typeof fireballs[i] !== 'undefined'){
             fireballs[i].update(lorn.getSense());
 
             var dismissable = false;
             
-            if(fireballs[i].animation.x > canvasW || fireballs[i].animation.x < 0){
+            if(fireballs[i].animation.x > canvasW || fireballs[i].animation.x < -10){
                 dismiss(fireballs[i], fireballs, i);
                 dismissable = true;
             }
@@ -255,7 +256,7 @@ function updateFireBalls(){
                     cat.randomizeCatDrop();
                     dismissable = true;
                     lorn.hitCat();
-                    console.log("fireball has hitten a poor cat");
+                    log("fireball has hitten a poor cat");
                 }
             }
             if(dismissable)
@@ -272,17 +273,17 @@ function handleKeyDown(event){
     	switch(event.keyCode){
     		
     		case Key.UP:
-    			console.log("Key.UP pressed");
+    			log("Key.UP pressed");
     			lorn.startJump();
     			break;
 
     		case Key.LEFT:
-    			console.log("Key.LEFT pressed");
+    			log("Key.LEFT pressed");
     			lorn.moveLeft();
     			break;
 
     		case Key.RIGHT:
-    			console.log("Key.RIGHT pressed");
+    			log("Key.RIGHT pressed");
     			lorn.moveRight();
     			break;
 
@@ -318,7 +319,7 @@ function handleKeyUp(event){
     	switch(event.keyCode){
     		
     		case Key.UP:
-    			console.log("Key.UP released");
+    			log("Key.UP released");
     			lorn.endJump();
     			break;
 
@@ -331,12 +332,12 @@ function handleKeyUp(event){
                     //init();
                 }
 
-    			console.log("Key.SPACE released");
+    			log("Key.SPACE released");
     			x = lorn.animation.x;
     			y = lorn.animation.y;
 
                 if(lorn.hasFireBalls()){
-                    console.log("lorn's shooted");
+                    log("lorn's shooted");
     			     fireballs.push(new FireBall(x, y, lorn.getSense(false)));
                      lorn.shoot();
     			     stage.addChild(fireballs[fireballs.length - 1].animation);
@@ -344,12 +345,12 @@ function handleKeyUp(event){
     			break;
 
     		case Key.LEFT:
-    			console.log("Key.LEFT released");
+    			log("Key.LEFT released");
     			lorn.stopMovingLeft();
     			break;
 
     		case Key.RIGHT:
-    			console.log("Key.RIGHT released");
+    			log("Key.RIGHT released");
     			lorn.stopMovingRight();
     			break;
     	}
@@ -386,7 +387,7 @@ var AnimationBorder = (function(){
 function rectCollisionDetection(obj, target){
     var frst = new AnimationBorder(obj);
     var scnd = new AnimationBorder(target);
-    //console.log("borders: " + scnd.leftBound + ", "+ scnd.rightBound + ", " + scnd.topBound+ ", " + scnd.bottomBound)
+    //log("borders: " + scnd.leftBound + ", "+ scnd.rightBound + ", " + scnd.topBound+ ", " + scnd.bottomBound)
 
     var collision = true;
 
@@ -397,7 +398,7 @@ function rectCollisionDetection(obj, target){
     }
 
     if(collision)
-        console.log("colision detected.");
+        log("colision detected.");
 
     return collision;
 }
@@ -425,7 +426,7 @@ function gameStart() {
     // add trees at the stage based on zOrder list (in ascending order)
     for (var count = 0; count < TREE_NUM; count++) {
 
-        console.log("parallax: " + zOrder[count]);
+        log("parallax: " + zOrder[count]);
         trees[count] = new Tree(Math.random()* canvasW * 1.25, GROUND_LEVEL, zOrder[count]);
     }
 
@@ -439,4 +440,9 @@ function gameStart() {
     }
 
     display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
+}
+
+function log(msg){
+    if (DEBUG == true)
+        console.log(msg);
 }
