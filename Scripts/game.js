@@ -71,16 +71,14 @@ function preload() {
     queue.addEventListener("loadstart", loading);
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "diamond-song", src: "sounds/Lorn-Diamond.mp3" },
-        { id: "thunder", src: "sounds/thunder.ogg" },
-        { id: "engine", src: "sounds/engine.ogg" },
-        { id: "lorn", src: "images/lorn.png" },
-        { id: "fireball", src: "images/fireball.png" },
-        { id: "cat", src: "images/cat.png"},
-        { id: "tree", src: "images/tree.png"},
-        { id: "diamond", src: "images/diamond.png"},
-        { id: "brand", src: "images/gamebrand.png"},
-        { id: "controls", src: "images/controls.png"}
+        { id: "diamond-song", src: "assets/sounds/Lorn-Diamond.mp3" },
+        { id: "lorn", src: "assets/images/lorn.png" },
+        { id: "fireball", src: "assets/images/fireball.png" },
+        { id: "cat", src: "assets/images/cat.png"},
+        { id: "tree", src: "assets/images/tree.png"},
+        { id: "diamond", src: "assets/images/diamond.png"},
+        { id: "brand", src: "assets/images/gamebrand.png"},
+        { id: "controls", src: "assets/images/controls.png"}
     ]);
 }
 

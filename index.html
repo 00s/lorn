@@ -1,36 +1,44 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>LORN</title>
 
-    <!--  GOOGLE FONT -->
-    <link href='http://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
+    <head>
 
-</head>
-<body onload="preload()" style="background-color: black;">
-    <canvas id="canvas"  style="background-color: #003380;"></canvas>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>LORN</title>
 
-    <!-- JavaScript Section -->
-    <script src="Scripts/lib/jquery-2.1.1.min.js"></script>
+        <!--  GOOGLE FONTS -->
+        <link href='http://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
 
-    <!-- Game Framework -->
-    <script src="Scripts/lib/easeljs-0.7.1.min.js"></script>
-    <script src="Scripts/lib/tweenjs-0.5.1.min.js"></script>
-    <script src="Scripts/lib/soundjs-0.5.2.min.js"></script>
-    <script src="Scripts/lib/preloadjs-0.4.1.min.js"></script>
+    </head>
 
+    <body onload="preload()" style="background-color: black;">
 
-    <!-- Game Files -->
-    <script src="Scripts/Lorn.js"></script>
-    <script src="Scripts/Cat.js"></script>
-    <script src="Scripts/FireBall.js"></script>
-    <script src="Scripts/Tree.js"></script>
-    <script src="Scripts/Display.js"></script>
-    <script src="Scripts/Diamond.js"></script>
-    <script src="Scripts/filters/BoxBlurFilter.js"></script>
+        <!-- Canvas -->
+        <canvas id="canvas"  style="background-color: #003380;"></canvas>
 
-    <script src="Scripts/game.js"></script>
-</body>
+        <!-- JavaScript Section -->
+        <script src="Scripts/lib/jquery-2.1.1.min.js"></script>
+
+        <!-- Game Frameworks -->
+        <script src="Scripts/lib/easeljs-0.7.1.min.js"></script>
+        <script src="Scripts/lib/tweenjs-0.5.1.min.js"></script>
+        <script src="Scripts/lib/soundjs-0.5.2.min.js"></script>
+        <script src="Scripts/lib/preloadjs-0.4.1.min.js"></script>
+
+        <!-- Game Classes -->
+        <script src="Scripts/Classes/Lorn.js"></script>
+        <script src="Scripts/Classes/Cat.js"></script>
+        <script src="Scripts/Classes/FireBall.js"></script>
+        <script src="Scripts/Classes/Tree.js"></script>
+        <script src="Scripts/Classes/Display.js"></script>
+        <script src="Scripts/Classes/Diamond.js"></script>
+
+        <!-- Game Filters -->
+        <script src="Scripts/filters/BoxBlurFilter.js"></script>
+
+        <!-- Game logic -->
+        <script src="Scripts/game.js"></script>
+    </body>
+
 </html>
