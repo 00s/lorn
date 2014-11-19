@@ -1,13 +1,16 @@
+var NEXT_POS_FACTOR = 5;
+var D_GRAVITY = 0.05;
+var WIGGLE_VELOCITY = -4;
+
 // Diamond CLass
 
 var Diamond = (function () {
 
-	// constructor
-	function Diamond(x, y) {
+    // constructor
+    function Diamond(x, y) {
 
         this._width  = 52;
         this._height = 40;
-
 
         // spriteSheet setup
         this.data = {
@@ -23,27 +26,40 @@ var Diamond = (function () {
 
         this.animation.scaleX = 0.5;
         this.animation.scaleY = 0.5;
-		// x and y params used for seting the object in stage
+        // x and y params used for seting the object in stage
         this.animation.x = x;
         this.animation.y = y;
 
-        stage.addChild(this.animation);
-        console.log("diamond added at " + x +", "+ y);
-
+        // ref for wiggling move
+        this.initialHeight = y + 10;
+        this.wiggleUp = true;
+        this.wigVelocity = -WIGGLE_VELOCITY;
+        
+        //stage.addChild(this.animation);
+        //console.log("diamond added at " + x +", "+ y);
+        //console.log("initialHeight " + this.initialHeight);
 	}
 
     Diamond.prototype.update = function (sense, velocity) {
 
         this.animation.x -= sense*(velocity);
+        this.wiggle();
+    }
+
+    Diamond.prototype.wiggle = function (argument) {
+
+        this.wigVelocity += D_GRAVITY;
+        this.animation.y += this.wigVelocity;
+        
+        if(this.animation.y > this.initialHeight){
+            this.wigVelocity = -4;
+            this.animation.y = this.initialHeight;
+        }
     }
 
     Diamond.prototype.redefinePosition = function () {
-        this.animation.x = canvasW * 5;
-    }
-
-    FireBall.prototype.dismiss = function () {
-
-        stage.removeChild(this.animation);
+        
+        this.animation.x = canvasW * NEXT_POS_FACTOR;
     }
 
 	return Diamond;
