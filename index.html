@@ -9,7 +9,6 @@
 
         <!--  GOOGLE FONTS -->
         <link href='http://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
-
     </head>
 
     <body onload="preload()" style="background-color: black;">
@@ -26,7 +25,12 @@
         <script src="Scripts/lib/soundjs-0.5.2.min.js"></script>
         <script src="Scripts/lib/preloadjs-0.4.1.min.js"></script>
 
-        <!-- Game Classes -->
+        <!-- helper functions -->
+        <script src="helpers.js"></script>
+        <!-- 
+            Game Classes :
+                Class files must be required before game.js 
+        -->
         <script src="Scripts/Classes/Lorn.js"></script>
         <script src="Scripts/Classes/Cat.js"></script>
         <script src="Scripts/Classes/FireBall.js"></script>

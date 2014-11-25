@@ -36,8 +36,8 @@ var Diamond = (function () {
         this.wigVelocity = -WIGGLE_VELOCITY;
         
         //stage.addChild(this.animation);
-        //console.log("diamond added at " + x +", "+ y);
-        //console.log("initialHeight " + this.initialHeight);
+        log("diamond added at " + x +", "+ y);
+        log("initialHeight " + this.initialHeight);
 	}
 
     Diamond.prototype.update = function (sense, velocity) {

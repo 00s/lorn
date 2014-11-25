@@ -2,7 +2,7 @@
 
 var Display = (function () {
 
-    // constructor 2
+    // constructor
     function Display(initialText, size, font, color, x, y) {
         this.labelString = initialText;
         this.label = new createjs.Text(this.labelString, size +"px "+ font, color);
@@ -17,6 +17,7 @@ var Display = (function () {
         stage.addChild(this.label);
     }
 
+    // updates the text displayed
     Display.prototype.update = function (text) {
         
         this.labelString = text;

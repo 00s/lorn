@@ -1,23 +1,14 @@
+
+// PRESET ATTRIBUTES AND REFS
 var RECOVERING_TIME = 750;
 var DISTANCE_PER_MOVE = 10;
 var HIT_CAT_SCORE = 50;
 var GRAVITY  = 0.6;
 var LIVES = 3;
 
-
-// Auxiliar function for String Formating. 
-// src: http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-if (!String.format) {
-  String.format = function(format) {
-    var args = Array.prototype.slice.call(arguments, 1);
-    return format.replace(/{(\d+)}/g, function(match, number) { 
-      return typeof args[number] != 'undefined'
-        ? args[number] 
-        : match
-      ;
-    });
-  };
-}
+// width and height reference for spriteShitData
+var LORN_FRAME_W = 28;
+var LORN_FRAME_H = 48;
 
 // lorn Character
 var Lorn = (function () {
@@ -32,20 +23,21 @@ var Lorn = (function () {
         this.score = 0;
         this.lives = LIVES;
 
-        // Diamonds and Fireballs
+        // Diamonds and Fireballs counters
         this.fireballs = 0;
         this.diamonds = 0;
 
         // sprite size reference
-        this._width  = 28;
-        this._height = 48;
+        this._width  = LORN_FRAME_W;
+        this._height = LORN_FRAME_H;
 
-        // rectangle reference for collision detection
+        this.regY = this._height * 0.5;
+        this.regX = this._width * 0.5;
 
         // SpriteSheet setup
         this.data = {
             images: [queue.getResult("lorn")],
-            frames: { width: this._width, height: this._height, regX: 14, regY: 24 },
+            frames: { width: this._width, height: this._height, regX: this.regX, regY: this.regY },
             animations: {
                 idle: { frames: [0,0], next: "walk"},
                 jump: { frames: [4,5], next: "walk"},
@@ -56,10 +48,10 @@ var Lorn = (function () {
         this.spriteSheet = new createjs.SpriteSheet(this.data);
         this.animation = new createjs.Sprite(this.spriteSheet, "walk");
 
+        // setup animation position (incording to parameters)
         this.animation.x = x;
-        this.animation.y = y;
-
-        stage.addChild(this.animation);
+        // Y is smaller for the avatar start above the floor level
+        this.animation.y = y - this.regY * 4;
     }
 
     Lorn.prototype.hasFireBalls = function () {
@@ -81,7 +73,6 @@ var Lorn = (function () {
         return String.format("\nLIVES: \t\t\t\t{0}\n\nFIREBALLS: {1}\n\nSCORE: \t\t\t\t{2}\n\nDIAMONDS: \t{3}\n\nDISTANCE: \t{4}",status[0],status[3],status[2],status[4],status[1]);
     }
     
-
     Lorn.prototype.hitCat = function () {
         this.score += HIT_CAT_SCORE;
     }
@@ -90,7 +81,7 @@ var Lorn = (function () {
     Lorn.prototype.startJump = function () {
 
     	if(!this.jumping){
-    		console.log("jump started");
+    		log("jump started");
     		this.velocityY = -13.0;
     		this.jumping = true;
     	}
@@ -99,7 +90,7 @@ var Lorn = (function () {
     // set end of jumping move
     Lorn.prototype.endJump = function () {
 		
-		console.log("jump ended");
+		log("jump ended");
     	
     	if(this.velocityY < -5.0){
     		this.velocityY = -5.0;
@@ -150,29 +141,35 @@ var Lorn = (function () {
     		setTimeout( function(){
     			_this.animation.alpha = 1.0;
     			_this.hitten = false;
-    			console.log("back to the game with " + _this.lives + " lives.")
+    			log("back to the game with " + _this.lives + " lives.")
     		}, RECOVERING_TIME);
     	}else{
-    		// state = Game.OVER;
+            // game over : hides Lorn
     	}
     }
 
     // check if lorn is not momving
     Lorn.prototype.isIdle = function (){
-        
+
         return (!this.movingLeft && !this.movingRight && !this.jumping);
     }
 
+    // colects diamonds 
     Lorn.prototype.colectDiamond = function (){
+        
         this.diamonds++;
+        // and attributes fireballs
         this.fireballs += 10;
     }
 
+    // return Lorn's total score
     Lorn.prototype.getTotalScore = function (){
-        return this.coveredDistance * 0.1 + this.score;
+        var total = this.coveredDistance * 0.1 + this.score 
+        // if total is smaller than zero, return 0
+        return (total >=0) ? total : 0;
     }
 
-    Lorn.prototype.update = function () {
+    Lorn.prototype.update = function (groundLevel) {
     	
         // apply GRAVITY to vertical velocity
     	this.velocityY +=GRAVITY;
@@ -180,23 +177,26 @@ var Lorn = (function () {
     	this.animation.y += this.velocityY;
 
     	// check if lorn is back to the ground and ends jump arch
-    	if(this.animation.y > GROUND_LEVEL - LORN_REG_Y){
-    		this.animation.y = GROUND_LEVEL - LORN_REG_Y;
+    	if(this.animation.y > groundLevel - this.regY){
+    		this.animation.y = groundLevel - this.regY;
     		this.velocityY = 0.0;
     		this.jumping = false;
     	}
 
+        // set animation when jumping
     	if(this.jumping)
     		this.animation.gotoAndPlay("jump");
 
-    	// verify and calculate horizontal moves
-    	if(this.movingLeft)
-    	   	this.coveredDistance -= DISTANCE_PER_MOVE;
-    	if(this.movingRight)
-    	 	this.coveredDistance += DISTANCE_PER_MOVE;
-
+        // set animation when idling
     	if(this.isIdle())
     		this.animation.gotoAndPlay("idle");
+
+        // verify and calculate horizontal moves
+        if(this.movingLeft)
+            this.coveredDistance -= DISTANCE_PER_MOVE;
+        if(this.movingRight)
+            this.coveredDistance += DISTANCE_PER_MOVE;
+
     }
 
     return Lorn;
