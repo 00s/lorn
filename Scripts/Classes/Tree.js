@@ -4,8 +4,7 @@ var BLUR_RADIUS = 1;
 var Tree = (function () {
 	function Tree (x, y, parallax) {
 
-		this.PARALLAX_FACTOR = 8;
-		this.parallax = parallax;
+	this.parallax = parallax;
 
         this.image = new createjs.Bitmap(queue.getResult("tree"));
         this.width = this.image.getBounds().width;
@@ -24,12 +23,10 @@ var Tree = (function () {
         this.image.x = x;
         this.image.y = y;
 
-        stage.addChild(this.image);
-
 	}
 
-	Tree.prototype.move = function (sense) {
-		this.image.x -= sense*(this.parallax * this.PARALLAX_FACTOR);
+	Tree.prototype.update = function (sense, velocity) {
+		this.image.x -= sense*(this.parallax * velocity);
 	}
 
 	return Tree;

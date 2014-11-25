@@ -3,3 +3,5 @@
 *.ts
 # ignore css files
 *.css
+# ignore any pdf files
+*.pdf

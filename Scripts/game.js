@@ -1,9 +1,9 @@
-﻿// © 
-
-var stage;
-var queue;
+﻿// html element ref
 var canvas;
-
+// createjs stage
+var stage;
+// Preload queue
+var queue;
 // ENUM for keys
 Key = {
     UP : 38,
@@ -18,48 +18,43 @@ Key = {
 // ENUM GAME STATE
 Game = {
     HOME : 0,
-    PLAYING : 1,
-    OVER : 2
+    INSTRUCTIONS: 1,
+    PLAYING : 2,
+    OVER : 3
 }
-
 // Game state
 var state;
 
-//controls
+// controls (bitmap img)
 var controls
 
 // reference for Instructions
-var dejavu = false;
+var dejavuControls = false;
 
-// gameOver obj
-var endMessage
-
-// soundtrack
+// game soundtrack
 var soundtrack;
 
-// Game Objects
+// GAME OBJECTS
 var display;
 var lorn;
 var diamond;
 
-
-// FireBall Array
+// GAME LISTS
+// for FireBalls
 var fireballs = [];
-// Tree Array
+// for Trees
 var trees = [];
-// Cats Array
+// for Cats
 var cats = [];
 
-
 // Game Constants
-var TREE_NUM = 11;
-var CAT_NUM = 4;
-
 var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight) - 35;
+
+var TREE_NUM = 11;
+var CAT_NUM = 1;
+
 var PARALLAX = 8;
-var LORN_REG_Y = 24;
-var CAT_REG_Y = 16;
-var TREE_REG_Y = 124;
+
 var GAME_FONT = "VT323";
 var FONT_SIZE = 22;
 var FONT_COLOUR = "white";
@@ -70,16 +65,14 @@ function preload() {
     queue.addEventListener("loadstart", loading);
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "diamond-song", src: "sounds/Lorn-Diamond.ogg" },
-        { id: "thunder", src: "sounds/thunder.ogg" },
-        { id: "engine", src: "sounds/engine.ogg" },
-        { id: "lorn", src: "images/lorn.png" },
-        { id: "fireball", src: "images/fireball.png" },
-        { id: "cat", src: "images/cat.png"},
-        { id: "tree", src: "images/tree.png"},
-        { id: "diamond", src: "images/diamond.png"},
-        { id: "brand", src: "images/gamebrand.png"},
-        { id: "controls", src: "images/controls.png"}
+        { id: "diamond-song", src: "assets/sounds/Lorn-Diamond.mp3" },
+        { id: "lorn", src: "assets/images/lorn.png" },
+        { id: "fireball", src: "assets/images/fireball.png" },
+        { id: "cat", src: "assets/images/cat.png"},
+        { id: "tree", src: "assets/images/tree.png"},
+        { id: "diamond", src: "assets/images/diamond.png"},
+        { id: "brand", src: "assets/images/gamebrand.png"},
+        { id: "controls", src: "assets/images/controls.png"}
     ]);
 }
 
@@ -88,10 +81,10 @@ function loading(){
     canvas = document.getElementById("canvas");
 
     canvas.width = document.body.clientWidth; //document.width is obsolete
-    canvas.height = GROUND_LEVEL; //document.height is obsolete
+    canvas.height = GROUND_LEVEL; 
     canvasW = canvas.width;
     canvasH = canvas.height;
-    stage.addChild(new Display(". . .", 90, GAME_FONT, FONT_COLOUR, canvasW * 0.45, canvasH * 0.5));
+    stage.addChild(new Display(". . .", 90, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5));
 }
 
 function init() {
@@ -112,9 +105,7 @@ function init() {
 
     //gameStart();
     state = Game.HOME;
-    
 }
-
 
 // Game Loop
 function gameLoop(event) {
@@ -126,6 +117,10 @@ function gameLoop(event) {
             homeScreen();
             break;
      
+        case Game.INSTRUCTIONS:
+            // instructions();
+            break;
+
         case Game.PLAYING:
             playing();
             break;
@@ -138,14 +133,7 @@ function gameLoop(event) {
     stage.update();
 }
 
-function getCentralizedBitmap(idOrUrl){
-    var bit = new createjs.Bitmap(queue.getResult(idOrUrl));
-    bit.regX = bit.getBounds().width * 0.5;
-    bit.regY = bit.getBounds().height * 0.5;
-    bit.x = canvasW * 0.5;
-    bit.y = canvasH * 0.5;
-    return bit;
-}
+// Functions for each game state:
 
 function homeScreen () {
     stage.clear();
@@ -153,59 +141,45 @@ function homeScreen () {
     stage.addChild(brand);
 }
 
-function presentControls(){
-    
-    if(!this.dejavu){
-
-        controls = getCentralizedBitmap("controls");
-        controls.y = canvasW * 0.10;
-        stage.addChild(controls);
-
-        setTimeout(function(){
-            stage.removeChild(controls);
-            this.dejavu = true;
-        }, 5000);
-    }
-}
-
 function playing(){
 
-    
+    // check if lorn is still alive
     if(lorn.lives <= 0)
         state = Game.OVER;
 
+    // if he was not hitten
     if(!lorn.hitten)
-        for (var count = 0; count < CAT_NUM; count++) {
+        // for each cat in stage
+        for (var count = 0; count < CAT_NUM; count++)
+            // check colision with him
             if(rectCollisionDetection(lorn, cats[count])){
+                // colision has happened
                 lorn.wasHitten();
-                console.log("Lorn lives: " + lorn.lives);
+                log("Lorn lives: " + lorn.lives);
             }
-        }
 
-    updateTrees();
-    lorn.update();
-    updateFireBalls();
-
-    diamond.update(lorn.getSense(true), PARALLAX);
-    
+    // check if lorn captures a diamond
     if(rectCollisionDetection(lorn, diamond)){
+        
         lorn.colectDiamond();
         diamond.redefinePosition();
     }
-
-    for (var count = 0; count < CAT_NUM; count++) {
-        cats[count].update(lorn.getSense(true));
-    }
+    
+    // update all the elements in stage
+    updateTrees();
+    updateFireBalls();
+    updateCats();
+    lorn.update(GROUND_LEVEL);
+    diamond.update(lorn.getSense(true), PARALLAX);
 
     // get player status and update display screen
     display.update(lorn.toString());
 }
 
 function gameover() {
-    // gameover
+    // capture lorn final scores
     lastStatus = lorn.getTotalScore();
-    lastStatus = (lastStatus > 0) ? lastStatus : 0;
-
+    
     stage.clear();
 
     stage.removeAllChildren();
@@ -219,11 +193,33 @@ function gameover() {
     var reminder = endMessage = new Display("press space to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
     
 }
+
+function displayControls(){
+    
+    // if first time playing (function has not been called yet)
+    if(!this.dejavuControls){
+
+        // create bitmap ref for 'controls' id
+        controls = getCentralizedBitmap("controls");
+        controls.y = canvasW * 0.10;
+
+        stage.addChild(controls);
+
+        // hide controls after 5 seconds
+        setTimeout(function(){
+            stage.removeChild(controls);
+            //and prevents function to be called again
+            this.dejavuControls = true;
+        }, 5000);
+    }
+}
+
+//updates all trees in stage
 function updateTrees(){
     
     for(var count = 0 ; count < TREE_NUM ; count++){
         var tree = trees[count];
-        tree.move(lorn.getSense(true));
+        tree.update(lorn.getSense(true), PARALLAX);
         
         // reuse trees when they are out of the bounds
         if(tree.image.x < -(canvasW * 0.5)){
@@ -235,32 +231,43 @@ function updateTrees(){
     }
 }
 
+// update each fireball on stage and remove from stage the ones that are out of view.
 function updateFireBalls(){
-    // update each fireball on stage and remove from stage the ones that are out of view.
+    
     for (i = 0; i < fireballs.length; i++) {
-        if(fireballs[i] !== undefined){
-            fireballs[i].update(lorn.getSense());
+
+        var fb = fireballs[i];
+        if(typeof fb !== 'undefined'){
+            
+            fb.update(lorn.getSense(true));
 
             var dismissable = false;
             
-            if(fireballs[i].animation.x > canvasW || fireballs[i].animation.x < 0){
-                dismiss(fireballs[i], fireballs, i);
+            if(fb.animation.x > canvasW + 15 || fb.animation.x < -15){
                 dismissable = true;
             }
 
             // check colision between fireballs and cats
             for (var count = 0; count < CAT_NUM; count++) {
                 var cat = cats[count];
-                if(rectCollisionDetection(fireballs[i], cat)){
+                if(!dismissable && rectCollisionDetection(fb, cat)){
                     cat.randomizeCatDrop();
                     dismissable = true;
                     lorn.hitCat();
-                    console.log("fireball has hitten a poor cat");
+                    log("fireball has hitten a poor cat");
                 }
             }
+            
             if(dismissable)
-                dismiss(fireballs[i], fireballs, i);
+                dismiss(fb, fireballs, i);
         }
+    }
+}
+
+function updateCats(){
+    for (var count = 0; count < CAT_NUM; count++) {
+        
+        cats[count].update(lorn.getSense(true));
     }
 }
 
@@ -268,41 +275,42 @@ function updateFireBalls(){
 
 function handleKeyDown(event){
 
-	switch(event.keyCode){
-		
-		case Key.UP:
-			console.log("Key.UP pressed");
-			lorn.startJump();
-			break;
+    if(state == Game.PLAYING)
+    	switch(event.keyCode){
+    		
+    		case Key.UP:
+    			log("Key.UP pressed");
+    			lorn.startJump();
+    			break;
 
-		case Key.LEFT:
-			console.log("Key.LEFT pressed");
-			lorn.moveLeft();
-			break;
+    		case Key.LEFT:
+    			log("Key.LEFT pressed");
+    			lorn.moveLeft();
+    			break;
 
-		case Key.RIGHT:
-			console.log("Key.RIGHT pressed");
-			lorn.moveRight();
-			break;
+    		case Key.RIGHT:
+    			log("Key.RIGHT pressed");
+    			lorn.moveRight();
+    			break;
 
-        case Key.I:
-            // volume down
-            soundtrack.volume -= 0.05;
-            break;
+            case Key.I:
+                // volume down
+                soundtrack.volume -= 0.05;
+                break;
 
-        case Key.O:
-            // volume up
-            soundtrack.volume += 0.05;
-            break;
+            case Key.O:
+                // volume up
+                soundtrack.volume += 0.05;
+                break;
 
-        case Key.M:
-            soundtrack.setMute(!soundtrack.getMute());
-            break;
+            case Key.M:
+                soundtrack.setMute(!soundtrack.getMute());
+                break;
 
-        case Key.P:
+            case Key.P:
 
-            break;
-	}
+                break;
+    	}
 }
 
 function handleKeyUp(event){
@@ -317,7 +325,7 @@ function handleKeyUp(event){
     	switch(event.keyCode){
     		
     		case Key.UP:
-    			console.log("Key.UP released");
+    			log("Key.UP released");
     			lorn.endJump();
     			break;
 
@@ -330,12 +338,12 @@ function handleKeyUp(event){
                     //init();
                 }
 
-    			console.log("Key.SPACE released");
+    			log("Key.SPACE released");
     			x = lorn.animation.x;
     			y = lorn.animation.y;
 
                 if(lorn.hasFireBalls()){
-                    console.log("lorn's shooted");
+                    log("lorn's shooted");
     			     fireballs.push(new FireBall(x, y, lorn.getSense(false)));
                      lorn.shoot();
     			     stage.addChild(fireballs[fireballs.length - 1].animation);
@@ -343,12 +351,12 @@ function handleKeyUp(event){
     			break;
 
     		case Key.LEFT:
-    			console.log("Key.LEFT released");
+    			log("Key.LEFT released");
     			lorn.stopMovingLeft();
     			break;
 
     		case Key.RIGHT:
-    			console.log("Key.RIGHT released");
+    			log("Key.RIGHT released");
     			lorn.stopMovingRight();
     			break;
     	}
@@ -358,34 +366,16 @@ function handleKeyUp(event){
 
 // auxiliar function for removing object from list and animation from stage
 function dismiss(obj, list, index){
-    stage.removeChild(obj.animation);
-    list.splice(index,1);
-}
-
-// Class for holding corner references of Animation objects
-var AnimationBorder = (function(){
-    function AnimationBorder(obj){
-
-        // used to reduced the final area (in pixels)
-        var CORRECTION = 3;
-
-        var objW = obj._width;
-        var objH = obj._height;
-        
-        this.leftBound      = (obj.animation.x - (objW * 0.5))      + CORRECTION;
-        this.rightBound     = (this.leftBound + objW)               - CORRECTION;
-        this.topBound       = (obj.animation.y - (objH * 0.5))      + CORRECTION;
-        this.bottomBound    = (this.topBound + objH)                - CORRECTION;
-        
+    if(typeof obj !== 'undefined'){
+        stage.removeChild(obj.animation);
+        list.splice(index,1);
     }
-
-    return AnimationBorder;
-})();
+}
 
 function rectCollisionDetection(obj, target){
     var frst = new AnimationBorder(obj);
     var scnd = new AnimationBorder(target);
-    //console.log("borders: " + scnd.leftBound + ", "+ scnd.rightBound + ", " + scnd.topBound+ ", " + scnd.bottomBound)
+    //log("borders: " + scnd.leftBound + ", "+ scnd.rightBound + ", " + scnd.topBound+ ", " + scnd.bottomBound)
 
     var collision = true;
 
@@ -396,7 +386,7 @@ function rectCollisionDetection(obj, target){
     }
 
     if(collision)
-        console.log("colision detected.");
+        log("colision detected.");
 
     return collision;
 }
@@ -405,32 +395,38 @@ function rectCollisionDetection(obj, target){
 // Main Game Function
 function gameStart() {
     
-
     stage.clear();
     stage.removeAllChildren();
     soundtrack.play();
-    presentControls();
+    displayControls();
 
     var zOrder = [];
     // randomize values for parallax effect
+    // values are used for scaling the trees
+    // the smaller, the further
     for (var count = 0; count < TREE_NUM; count++) {
 
         zOrder.push((Math.random() - 0.4)+0.7);
     }
-        // sort results for setting up trees order
-        zOrder.sort();
-
+       
+    // sort results for setting up trees order
+    // smaller trees are added first in stage
+    zOrder.sort();
 
     // add trees at the stage based on zOrder list (in ascending order)
     for (var count = 0; count < TREE_NUM; count++) {
 
-        console.log("parallax: " + zOrder[count]);
-        trees[count] = new Tree(Math.random()* canvasW * 1.25, GROUND_LEVEL, zOrder[count]);
+        log("parallax: " + zOrder[count]);
+        var t = new Tree(Math.random()* canvasW * 1.25, GROUND_LEVEL, zOrder[count]);
+        stage.addChild(t.image);
+        trees.push(t);
     }
 
-    lorn = new Lorn(canvasW * 0.5, GROUND_LEVEL - LORN_REG_Y);
+    lorn = new Lorn(canvasW * 0.5, GROUND_LEVEL);
+    stage.addChild(lorn.animation);
 
-    diamond = new Diamond(canvasW + 30, GROUND_LEVEL - LORN_REG_Y);
+    diamond = new Diamond(canvasW + 30, GROUND_LEVEL - lorn.regY);
+    stage.addChild(diamond.animation);
 
     for (var count = 0; count < CAT_NUM; count++) {
 
@@ -439,3 +435,5 @@ function gameStart() {
 
     display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
 }
+
+
