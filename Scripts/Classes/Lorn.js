@@ -142,10 +142,8 @@ var Lorn = (function () {
 
     // if lorn wasStricken, check lives and set stricken delay
     Lorn.prototype.wasStricken = function (state){
-        
         if(this.lives-- > 0){
 
-            this.animation.alpha = 0.5;
             this.stricken = true;
             
             var _this = this;
