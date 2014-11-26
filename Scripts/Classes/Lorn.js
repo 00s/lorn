@@ -37,11 +37,21 @@ var Lorn = (function () {
         // SpriteSheet setup
         this.data = {
             images: [queue.getResult("lorn")],
-            frames: { width: this._width, height: this._height, regX: this.regX, regY: this.regY },
+            
+            frames: { 
+                width: this._width, 
+                height: this._height, 
+                regX: this.regX, 
+                regY: this.regY 
+            },
+            
             animations: {
                 idle: { frames: [0,0], next: "walk"},
                 jump: { frames: [4,5], next: "walk"},
-                walk: [0, 8]
+                walk: [0, 8],
+                walkOnFire: [9, 17],
+                jumpOnFire: { frames: [13,14], next: "walkOnFire"},
+                idleOnFire: { frames: [9,9], next: "walkOnFire"},
             }
         };
 
@@ -183,13 +193,19 @@ var Lorn = (function () {
     		this.jumping = false;
     	}
 
+        var onFire = "";
+        // if player has powerUps
+        if(this.isOnFire())
+            // set OnFire String to proper define animation
+            onFire = "OnFire";
+
         // set animation when jumping
     	if(this.jumping)
-    		this.animation.gotoAndPlay("jump");
+    		this.animation.gotoAndPlay("jump" + onFire);
 
         // set animation when idling
     	if(this.isIdle())
-    		this.animation.gotoAndPlay("idle");
+    		this.animation.gotoAndPlay("idle" + onFire);
 
         // verify and calculate horizontal moves
         if(this.movingLeft)
@@ -197,6 +213,11 @@ var Lorn = (function () {
         if(this.movingRight)
             this.coveredDistance += DISTANCE_PER_MOVE;
 
+    }
+
+    // boolean: return true if Lorn has fireballs
+    Lorn.prototype.isOnFire = function (){
+        return (this.fireballs > 0)
     }
 
     return Lorn;
