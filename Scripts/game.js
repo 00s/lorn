@@ -188,14 +188,14 @@ function playing(){
     if(lorn.lives <= 0)
         state = Game.OVER;
 
-    // if he was not hitten
-    if(!lorn.hitten)
+    // if he was not Strick
+    if(!lorn.stricken)
         // for each cat in stage
         for (var count = 0; count < CAT_NUM; count++)
             // check colision with him
             if(rectCollisionDetection(lorn, cats[count])){
                 // colision has happened
-                lorn.wasHitten();
+                lorn.wasStricken();
                 log("Lorn lives: " + lorn.lives);
             }
 
