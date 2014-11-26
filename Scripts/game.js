@@ -85,7 +85,9 @@ function loading(){
     canvas.height = GROUND_LEVEL; 
     canvasW = canvas.width;
     canvasH = canvas.height;
-    stage.addChild(new Display(". . .", 90, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5));
+    var etc = new Display("loading . . .", 40, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
+    stage.addChild(etc.label);
+    stage.update();
 }
 
 function init() {
@@ -100,7 +102,6 @@ function init() {
     window.addEventListener( "keydown", handleKeyDown, false );
     window.addEventListener( "keyup", handleKeyUp, false );
     
-    //stage.enableMouseOver(20);
     createjs.Ticker.setFPS(40);
     createjs.Ticker.addEventListener("tick", gameLoop);
 
@@ -192,6 +193,10 @@ function gameover() {
     var gameoverMsg = new Display("GAME OVER", 90, "VT323", "white", canvasW * 0.5, canvasH *0.2);
     var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.5);
     var reminder = endMessage = new Display("press R to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
+
+    stage.addChild(gameoverMsg.label);
+    stage.addChild(scores.label);
+    stage.addChild(reminder.label);
     
 }
 
@@ -436,6 +441,7 @@ function gameStart() {
     }
 
     display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
+    stage.addChild(display.label);
 }
 
 

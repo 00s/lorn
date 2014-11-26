@@ -14,7 +14,6 @@ var Display = (function () {
         this.label.regX = this.label.getBounds().width * 0.5;
         this.label.regY = this.label.getBounds().height * 0.5;
 
-        stage.addChild(this.label);
     }
 
     // updates the text displayed
