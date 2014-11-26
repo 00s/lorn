@@ -1,6 +1,6 @@
 
 // PRESET ATTRIBUTES AND REFS
-var RECOVERING_TIME = 750;
+var RECOVERING_TIME = 1300;
 var DISTANCE_PER_MOVE = 10;
 var HIT_CAT_SCORE = 50;
 var GRAVITY  = 0.6;
@@ -139,23 +139,34 @@ var Lorn = (function () {
     	return (this.isIdle() && considerIdle) ? 0 : this.animation.scaleX;
     }
 
+
     // if lorn wasHitten, check lives and set hitten delay
     Lorn.prototype.wasHitten = function (state){
-    	
+        
         if(this.lives-- > 0){
 
-    		this.animation.alpha = 0.5;
-    		this.hitten = true;
-    		
-    		var _this = this;
-    		setTimeout( function(){
-    			_this.animation.alpha = 1.0;
-    			_this.hitten = false;
-    			log("back to the game with " + _this.lives + " lives.")
-    		}, RECOVERING_TIME);
-    	}else{
-            // game over : hides Lorn
-    	}
+            this.animation.alpha = 0.5;
+            this.hitten = true;
+            
+            var _this = this;
+            
+            blinking(_this);
+        }
+    }
+
+
+    function blinking(_this){
+        
+        var b = setInterval(function(){
+            _this.animation.alpha = (_this.animation.alpha == 1.0) ? 0.5 : 1.0;
+        } , 175);
+
+        setTimeout( function(){
+                clearInterval(b);
+                _this.animation.alpha = 1.0;
+                _this.hitten = false;
+                log("back to the game with " + _this.lives + " lives.")
+            }, RECOVERING_TIME);
     }
 
     // check if lorn is not momving
