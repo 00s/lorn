@@ -10,6 +10,7 @@ Key = {
     LEFT : 37,
     RIGHT : 39,
     SPACE : 32,
+    R: 82,
     P: 80,
     I: 73,
     O:79,
@@ -66,7 +67,7 @@ function preload() {
     queue.addEventListener("complete", init);
     queue.loadManifest([
         { id: "diamond-song", src: "assets/sounds/Lorn-Diamond.mp3" },
-        { id: "lorn", src: "assets/images/lorn.png" },
+        { id: "lorn", src: "assets/images/lorn-on-fire.png" },
         { id: "fireball", src: "assets/images/fireball.png" },
         { id: "cat", src: "assets/images/cat.png"},
         { id: "tree", src: "assets/images/tree.png"},
@@ -190,7 +191,7 @@ function gameover() {
 
     var gameoverMsg = new Display("GAME OVER", 90, "VT323", "white", canvasW * 0.5, canvasH *0.2);
     var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.5);
-    var reminder = endMessage = new Display("press space to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
+    var reminder = endMessage = new Display("press R to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
     
 }
 
@@ -331,13 +332,6 @@ function handleKeyUp(event){
 
     		case Key.SPACE:
 
-                // RESTART GAME if state is Game.OVER
-                if(state == Game.OVER){
-                    state = Game.PLAYING;
-                    gameStart();
-                    //init();
-                }
-
     			log("Key.SPACE released");
     			x = lorn.animation.x;
     			y = lorn.animation.y;
@@ -359,6 +353,14 @@ function handleKeyUp(event){
     			log("Key.RIGHT released");
     			lorn.stopMovingRight();
     			break;
+
+            // RESTART GAME if state is Game.OVER
+            case Key.R:
+                if(state == Game.OVER){
+                    state = Game.PLAYING;
+                    gameStart();
+                }
+                break;
     	}
 
     }
