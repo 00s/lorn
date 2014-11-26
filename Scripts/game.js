@@ -26,6 +26,9 @@ Game = {
 // Game state
 var state;
 
+// Loading Message
+var loadingMSG;
+
 // controls (bitmap img)
 var controls
 
@@ -77,6 +80,7 @@ function preload() {
     ]);
 }
 
+
 function loading(){
     stage = new createjs.Stage(document.getElementById("canvas"));
     canvas = document.getElementById("canvas");
@@ -85,12 +89,47 @@ function loading(){
     canvas.height = GROUND_LEVEL; 
     canvasW = canvas.width;
     canvasH = canvas.height;
-    var etc = new Display("loading . . .", 40, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
-    stage.addChild(etc.label);
-    stage.update();
+
+    var blink = 0;
+    var text = "loading . . .";
+    
+    var etc = new Display(text, 40, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
+
+    // animate Loading MSG
+    loadingMSG = setInterval(function(){
+        
+        switch(blink){
+            case 0:
+                text = "loading      " 
+                break;
+
+            case 1:
+                text = "loading .    "
+                break;
+
+            case 2:
+                text = "loading . .  "
+                break
+            case 3:
+                text = "loading . . .";
+                break;
+        }
+
+        blink = ((blink+ 1) % 4);
+
+        etc.update(text);
+
+        stage.removeAllChildren();
+        stage.addChild(etc.label);
+        stage.update();
+    
+    }, 100);
+
 }
 
 function init() {
+
+    clearInterval(loadingMSG);
     stage.removeAllChildren();
     // game soundtrack
     soundtrack = createjs.Sound.play("diamond-song"); 
