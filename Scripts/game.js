@@ -52,7 +52,26 @@ var trees = [];
 var cats = [];
 
 // Game Constants
-var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight) - 35;
+var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight);
+var CANVAS_WIDTH = Math.max( window.innerWidth, document.body.clientWidth);
+
+function calculateMaxAspectRatio(){
+
+    // 16:9 aspect ratio
+    var minHeight = 90;
+    var minWidth = 160;
+    var finalHeight = minHeight * 3; // starts with 180
+    var finalWidth = minWidth * 3; // per 320
+
+    while (finalHeight+minHeight <= GROUND_LEVEL * 0.95 && finalWidth+minWidth <= CANVAS_WIDTH){
+        finalHeight += minHeight;
+        finalWidth += minWidth;
+    }
+
+    GROUND_LEVEL = finalHeight;
+    CANVAS_WIDTH = finalWidth;
+    
+}    
 
 var TREE_NUM = 11;
 var CAT_NUM = 1;
@@ -85,7 +104,13 @@ function loading(){
     stage = new createjs.Stage(document.getElementById("canvas"));
     canvas = document.getElementById("canvas");
 
-    canvas.width = document.body.clientWidth; //document.width is obsolete
+    console.log("BEFORE -\n height: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
+
+    calculateMaxAspectRatio();
+
+    console.log("AFTER -\n height: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
+
+    canvas.width = CANVAS_WIDTH;
     canvas.height = GROUND_LEVEL; 
     canvasW = canvas.width;
     canvasH = canvas.height;
