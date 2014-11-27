@@ -119,6 +119,7 @@ function loading(){
     var text = "loading ...";
     loadingMSG = new Display(text, 40, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
     stage.addChild(loadingMSG.label);
+
     stage.update();
 
     // add progress listener to queue
