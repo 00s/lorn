@@ -116,7 +116,7 @@ function loading(){
     canvasW = canvas.width;
     canvasH = canvas.height;
 
-    var text = ". . .";
+    var text = " . . . ";
     loadingMSG = new Display(text, 40, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
     stage.addChild(loadingMSG.label);
 
@@ -134,7 +134,7 @@ function logProgress(event){
 
     log("progress: " + progress);
 
-    loadingMSG.update("Loading ... " + progress * 100 + "%");
+    loadingMSG.update( progress * 100 + "%");
 
     stage.update();
 }
