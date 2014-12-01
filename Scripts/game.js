@@ -38,7 +38,13 @@ var dejavuControls = false;
 // game soundtrack
 var soundtrack;
 
+// brand layers for homeScreen
+var redBrand, blackBrand, blueBrand;
 
+// homescreen references
+var brandContainer;
+var middle;
+var isAtHome = false;
 
 // GAME OBJECTS
 var display;
@@ -93,14 +99,17 @@ function preload() {
     
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "diamond-song", src: "assets/sounds/Lorn-Diamond.mp3" },
-        { id: "lorn", src: "assets/images/lorn-on-fire.png" },
-        { id: "fireball", src: "assets/images/fireball.png" },
-        { id: "cat", src: "assets/images/cat.png"},
-        { id: "tree", src: "assets/images/tree.png"},
-        { id: "diamond", src: "assets/images/diamond.png"},
-        { id: "brand", src: "assets/images/gamebrand.png"},
-        { id: "controls", src: "assets/images/controls.png"}
+        { id: "diamond-song",   src: "assets/sounds/Lorn-Diamond.mp3" },
+        { id: "red-brand",      src: "assets/images/red-thin-brand.png"},
+        { id: "black-brand",    src: "assets/images/black-thin-brand.png"},
+        { id: "blue-brand",     src: "assets/images/blue-thin-brand.png"},
+        { id: "lorn",           src: "assets/images/lorn-on-fire.png" },
+        { id: "fireball",       src: "assets/images/fireball.png" },
+        { id: "cat",            src: "assets/images/cat.png"},
+        { id: "tree",           src: "assets/images/tree.png"},
+        { id: "diamond",        src: "assets/images/diamond.png"},
+        { id: "brand",          src: "assets/images/gamebrand.png"},
+        { id: "controls",       src: "assets/images/controls.png"}
     ]);
 }
 
@@ -138,7 +147,7 @@ function logProgress(event){
 
     log("progress: " + progress);
 
-    loadingMSG.update( progress * 100 + "%");
+    loadingMSG.update( parseInt(progress * 100) + "%");
 
     stage.update();
 }
@@ -191,10 +200,55 @@ function gameLoop(event) {
 
 // Functions for each game state:
 
+
+function setupHomeScreen(){
+
+    if(!isAtHome){
+
+        stage.clear();
+        middle = new createjs.Point(canvasW * 0.5, canvasH * 0.5);
+       
+        redBrand = new Brand("red-brand", middle.x + 2, middle.y -2, -3);
+        blackBrand = new Brand("black-brand", middle.x, middle.y, 1);
+        blueBrand = new Brand("blue-brand", middle.x - 2, middle.y + 2, 5);
+
+        brandContainer = new createjs.Container();
+
+        brandContainer.addChild(blueBrand.img);
+        brandContainer.addChild(redBrand.img);
+        brandContainer.addChild(blackBrand.img);
+
+        stage.addChild(brandContainer);
+
+        stage.enableMouseOver(40);
+
+        stage.on("mouseover", handleMouseOver);
+
+        isAtHome = true;
+    }
+}
+
+function handleMouseOver(evt){
+    log("handling mouse over at " + createjs.Ticker.getMeasuredFPS() + " fps.");
+
+    var umX = evt.stageX;
+    var umY = evt.stageY;
+
+    var mouse = new createjs.Point(umX, umY);
+
+    redBrand.update(mouse, middle);
+    blackBrand.update(mouse, middle);
+    blueBrand.update(mouse, middle);
+
+    stage.update();
+
+}
+
+
 function homeScreen () {
-    stage.clear();
-    var brand = getCentralizedBitmap("brand");
-    stage.addChild(brand);
+    
+    setupHomeScreen();
+
 }
 
 function playing(){
