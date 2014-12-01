@@ -38,6 +38,8 @@ var dejavuControls = false;
 // game soundtrack
 var soundtrack;
 
+
+
 // GAME OBJECTS
 var display;
 var lorn;
@@ -50,6 +52,8 @@ var fireballs = [];
 var trees = [];
 // for Cats
 var cats = [];
+// bestScores
+var bestScores = [];
 
 // Game Constants
 var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight);
@@ -86,6 +90,7 @@ function preload() {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
     queue.addEventListener("loadstart", loading);
+    
     queue.addEventListener("complete", init);
     queue.loadManifest([
         { id: "diamond-song", src: "assets/sounds/Lorn-Diamond.mp3" },
@@ -104,57 +109,42 @@ function loading(){
     stage = new createjs.Stage(document.getElementById("canvas"));
     canvas = document.getElementById("canvas");
 
-    console.log("BEFORE -\n height: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
+    log("BEFORE\nheight: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
 
     calculateMaxAspectRatio();
 
-    console.log("AFTER -\n height: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
+    log("AFTER\nheight: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
 
     canvas.width = CANVAS_WIDTH;
     canvas.height = GROUND_LEVEL; 
     canvasW = canvas.width;
     canvasH = canvas.height;
 
-    var blink = 0;
-    var text = "loading . . .";
-    
-    var etc = new Display(text, 40, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
+    var text = " . . . ";
+    loadingMSG = new Display(text, 40, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
+    stage.addChild(loadingMSG.label);
 
-    // animate Loading MSG
-    loadingMSG = setInterval(function(){
-        
-        switch(blink){
-            case 0:
-                text = "loading      " 
-                break;
+    stage.update();
 
-            case 1:
-                text = "loading .    "
-                break;
+    // add progress listener to queue
+    queue.addEventListener("progress", logProgress);
 
-            case 2:
-                text = "loading . .  "
-                break
-            case 3:
-                text = "loading . . .";
-                break;
-        }
+}
 
-        blink = ((blink+ 1) % 4);
+// log preload progress and updates loading msg at UI
+function logProgress(event){
 
-        etc.update(text);
+    var progress = event.progress;
 
-        stage.removeAllChildren();
-        stage.addChild(etc.label);
-        stage.update();
-    
-    }, 100);
+    log("progress: " + progress);
 
+    loadingMSG.update( progress * 100 + "%");
+
+    stage.update();
 }
 
 function init() {
 
-    clearInterval(loadingMSG);
     stage.removeAllChildren();
     // game soundtrack
     soundtrack = createjs.Sound.play("diamond-song"); 
@@ -210,8 +200,12 @@ function homeScreen () {
 function playing(){
 
     // check if lorn is still alive
-    if(lorn.lives <= 0)
+    if(lorn.lives <= 0){
+        // capture lorn final scores
+        lastStatus = lorn.getTotalScore();
+        arrangeBestScores(lastStatus);
         state = Game.OVER;
+    }
 
     // if he was not Strick
     if(!lorn.stricken)
@@ -243,9 +237,6 @@ function playing(){
 }
 
 function gameover() {
-    // capture lorn final scores
-    lastStatus = lorn.getTotalScore();
-    
     stage.clear();
 
     stage.removeAllChildren();
@@ -254,12 +245,14 @@ function gameover() {
     trees = [];
     cats = [];
 
-    var gameoverMsg = new Display("GAME OVER", 90, "VT323", "white", canvasW * 0.5, canvasH *0.2);
-    var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.5);
+    var gameoverMsg = new Display("GAME OVER", 50, "VT323", "white", canvasW * 0.5, canvasH *0.2);
+    var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.4);
+    var theBest = new Display("BEST SCORES: "+ bestScores, 35, "VT323", "white", canvasW * 0.5, canvasH *0.6);
     var reminder = endMessage = new Display("press R to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
-
+    
     stage.addChild(gameoverMsg.label);
     stage.addChild(scores.label);
+    stage.addChild(theBest.label);
     stage.addChild(reminder.label);
     
 }
@@ -462,6 +455,22 @@ function rectCollisionDetection(obj, target){
     return collision;
 }
 
+// arrange  player's best scores in descending order
+function arrangeBestScores(actualScore){
+    
+    if(bestScores.length < 5){
+        
+        bestScores.push(actualScore);
+    }
+
+    else if (bestScores[bestScores.length - 1] < actualScore){
+        
+        bestScores.pop();
+        bestScores.push(actualScore);
+    }
+
+    bestScores.sort().reverse();
+}
 
 // Main Game Function
 function gameStart() {
