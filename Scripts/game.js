@@ -38,6 +38,8 @@ var dejavuControls = false;
 // game soundtrack
 var soundtrack;
 
+
+
 // GAME OBJECTS
 var display;
 var lorn;
@@ -50,6 +52,8 @@ var fireballs = [];
 var trees = [];
 // for Cats
 var cats = [];
+// bestScores
+var bestScores = [];
 
 // Game Constants
 var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight);
@@ -196,8 +200,12 @@ function homeScreen () {
 function playing(){
 
     // check if lorn is still alive
-    if(lorn.lives <= 0)
+    if(lorn.lives <= 0){
+        // capture lorn final scores
+        lastStatus = lorn.getTotalScore();
+        arrangeBestScores(lastStatus);
         state = Game.OVER;
+    }
 
     // if he was not Strick
     if(!lorn.stricken)
@@ -229,9 +237,6 @@ function playing(){
 }
 
 function gameover() {
-    // capture lorn final scores
-    lastStatus = lorn.getTotalScore();
-    
     stage.clear();
 
     stage.removeAllChildren();
@@ -240,12 +245,14 @@ function gameover() {
     trees = [];
     cats = [];
 
-    var gameoverMsg = new Display("GAME OVER", 90, "VT323", "white", canvasW * 0.5, canvasH *0.2);
-    var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.5);
+    var gameoverMsg = new Display("GAME OVER", 50, "VT323", "white", canvasW * 0.5, canvasH *0.2);
+    var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.4);
+    var theBest = new Display("BEST SCORES: "+ bestScores, 35, "VT323", "white", canvasW * 0.5, canvasH *0.6);
     var reminder = endMessage = new Display("press R to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
-
+    
     stage.addChild(gameoverMsg.label);
     stage.addChild(scores.label);
+    stage.addChild(theBest.label);
     stage.addChild(reminder.label);
     
 }
@@ -448,6 +455,22 @@ function rectCollisionDetection(obj, target){
     return collision;
 }
 
+// arrange  player's best scores in descending order
+function arrangeBestScores(actualScore){
+    
+    if(bestScores.length < 5){
+        
+        bestScores.push(actualScore);
+    }
+
+    else if (bestScores[bestScores.length - 1] < actualScore){
+        
+        bestScores.pop();
+        bestScores.push(actualScore);
+    }
+
+    bestScores.sort().reverse();
+}
 
 // Main Game Function
 function gameStart() {
