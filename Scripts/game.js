@@ -99,16 +99,20 @@ function preload() {
     
     queue.addEventListener("complete", init);
     queue.loadManifest([
+
         { id: "diamond-song",   src: "assets/sounds/Lorn-Diamond.mp3" },
+        
         { id: "red-brand",      src: "assets/images/red-thin-brand.png"},
         { id: "black-brand",    src: "assets/images/black-thin-brand.png"},
         { id: "blue-brand",     src: "assets/images/blue-thin-brand.png"},
+
         { id: "lorn",           src: "assets/images/lorn-on-fire.png" },
         { id: "fireball",       src: "assets/images/fireball.png" },
         { id: "cat",            src: "assets/images/cat.png"},
         { id: "tree",           src: "assets/images/tree.png"},
         { id: "diamond",        src: "assets/images/diamond.png"},
         { id: "brand",          src: "assets/images/gamebrand.png"},
+
         { id: "controls",       src: "assets/images/controls.png"}
     ]);
 }
@@ -208,37 +212,42 @@ function setupHomeScreen(){
         stage.clear();
         middle = new createjs.Point(canvasW * 0.5, canvasH * 0.5);
        
-        redBrand = new Brand("red-brand", middle.x + 2, middle.y -2, -3);
-        blackBrand = new Brand("black-brand", middle.x, middle.y, 1);
-        blueBrand = new Brand("blue-brand", middle.x - 2, middle.y + 2, 5);
+        redBrand = new Brand("red-brand", middle.x + 2, middle.y -2, -2);
+        blackBrand = new Brand("black-brand", middle.x, middle.y, 0.3);
+        blueBrand = new Brand("blue-brand", middle.x - 2, middle.y + 2, 2);
 
         brandContainer = new createjs.Container();
 
-        brandContainer.addChild(blueBrand.img);
         brandContainer.addChild(redBrand.img);
+        brandContainer.addChild(blueBrand.img);
+        //black on top
         brandContainer.addChild(blackBrand.img);
 
         stage.addChild(brandContainer);
 
-        stage.enableMouseOver(40);
+        stage.enableMouseOver(10);
 
-        stage.on("mouseover", handleMouseOver);
+        stage.on("stagemousemove", handleMouseOver);
 
         isAtHome = true;
     }
 }
 
+// makes the brand move accordingly to cursor movement
 function handleMouseOver(evt){
-    log("handling mouse over at " + createjs.Ticker.getMeasuredFPS() + " fps.");
+    log("handling cursor over at " + createjs.Ticker.getMeasuredFPS() + " fps.");
 
-    var umX = evt.stageX;
-    var umY = evt.stageY;
+    //read cursor coordinates
+    var cursorX = evt.stageX;
+    var cursorY = evt.stageY;
 
-    var mouse = new createjs.Point(umX, umY);
+    // create Point whit cursor 
+    var cursor = new createjs.Point(cursorX, cursorY);
 
-    redBrand.update(mouse, middle);
-    blackBrand.update(mouse, middle);
-    blueBrand.update(mouse, middle);
+    // apply movement to the brands in stage
+    redBrand.update(cursor, middle);
+    blackBrand.update(cursor, middle);
+    blueBrand.update(cursor, middle);
 
     stage.update();
 
@@ -434,6 +443,8 @@ function handleKeyUp(event){
 
     if(state == Game.HOME){
     
+        // should stop mouse tracking (not working properly)
+        stage.enableMouseOver(0);
         state = Game.PLAYING;
         gameStart();
     

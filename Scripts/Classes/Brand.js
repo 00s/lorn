@@ -1,5 +1,7 @@
 var Brand = (function  (){
 	
+	// the bigger this variable, the less the shift (.update fuction)
+	var PARALLAX_VARIATION = 70;
 
 	function Brand(idOrUrl, x,y,z){
 
@@ -12,9 +14,10 @@ var Brand = (function  (){
 	    this.z = z;
 	}
 
+	// parallax movement based on 2 points
 	Brand.prototype.update = function (point, counterPoint){
-		this.img.x = counterPoint.x +  (point.x - counterPoint.x) / 30 * this.z;
-		this.img.y = counterPoint.y + (point.y - counterPoint.y) / 30 * this.z;
+		this.img.x = counterPoint.x +  (point.x - counterPoint.x) / PARALLAX_VARIATION * this.z;
+		this.img.y = counterPoint.y + (point.y - counterPoint.y) / PARALLAX_VARIATION * this.z;
 	}
 
 	return Brand;
