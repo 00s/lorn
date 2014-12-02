@@ -227,6 +227,9 @@ function setupHomeScreen(){
 
         stage.enableMouseOver(10);
 
+        // enable touch interaction on supported display
+	if (createjs.Touch.isSupported()) { createjs.Touch.enable(stage); }
+
         stage.on("stagemousemove", handleMouseOver);
 
         isAtHome = true;
