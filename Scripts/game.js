@@ -169,6 +169,7 @@ function init() {
     window.addEventListener( "keydown", handleKeyDown, false );
     window.addEventListener( "keyup", handleKeyUp, false );
     
+    createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.setFPS(40);
     createjs.Ticker.addEventListener("tick", gameLoop);
 
