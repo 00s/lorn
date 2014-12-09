@@ -20,7 +20,7 @@ var Cat = (function () {
 			animations: {
 				sit: 8,
 				standUp: {frames: [7, 6, 0], next: "walk", speed: 2},
-				walk: [0,5, "walk", 1]
+				walk: [0,5, "walk", 0.3]
 			}
 		};
         this.spriteSheet = new createjs.SpriteSheet(this.data);

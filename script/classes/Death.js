@@ -2,7 +2,7 @@
     {
         name:  "Death.js",
         author: "Adolfo Farias",
-        description: "Death character. Enemy."
+        description: "Class for Death character. Enemy."
     }
 */
 

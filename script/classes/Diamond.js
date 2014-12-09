@@ -46,7 +46,7 @@ var Diamond = (function () {
         this.wiggle();
     }
 
-    Diamond.prototype.wiggle = function (argument) {
+    Diamond.prototype.wiggle = function () {
 
         this.wigVelocity += D_GRAVITY;
         this.animation.y += this.wigVelocity;
