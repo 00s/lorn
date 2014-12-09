@@ -38,7 +38,13 @@ var dejavuControls = false;
 // game soundtrack
 var soundtrack;
 
+// brand layers for homeScreen
+var redBrand, blackBrand, blueBrand;
 
+// homescreen references
+var brandContainer;
+var middle;
+var isAtHome = false;
 
 // GAME OBJECTS
 var display;
@@ -93,14 +99,21 @@ function preload() {
     
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "diamond-song", src: "assets/sounds/Lorn-Diamond.mp3" },
-        { id: "lorn", src: "assets/images/lorn-on-fire.png" },
-        { id: "fireball", src: "assets/images/fireball.png" },
-        { id: "cat", src: "assets/images/cat.png"},
-        { id: "tree", src: "assets/images/tree.png"},
-        { id: "diamond", src: "assets/images/diamond.png"},
-        { id: "brand", src: "assets/images/gamebrand.png"},
-        { id: "controls", src: "assets/images/controls.png"}
+
+        { id: "diamond-song",   src: "assets/sounds/Lorn-Diamond.mp3" },
+        
+        { id: "red-brand",      src: "assets/images/red-thin-brand.png"},
+        { id: "black-brand",    src: "assets/images/black-thin-brand.png"},
+        { id: "blue-brand",     src: "assets/images/blue-thin-brand.png"},
+
+        { id: "lorn",           src: "assets/images/lorn-on-fire.png" },
+        { id: "fireball",       src: "assets/images/fireball.png" },
+        { id: "cat",            src: "assets/images/cat.png"},
+        { id: "tree",           src: "assets/images/tree.png"},
+        { id: "diamond",        src: "assets/images/diamond.png"},
+        { id: "brand",          src: "assets/images/gamebrand.png"},
+
+        { id: "controls",       src: "assets/images/controls.png"}
     ]);
 }
 
@@ -138,7 +151,7 @@ function logProgress(event){
 
     log("progress: " + progress);
 
-    loadingMSG.update( progress * 100 + "%");
+    loadingMSG.update( parseInt(progress * 100) + "%");
 
     stage.update();
 }
@@ -156,6 +169,7 @@ function init() {
     window.addEventListener( "keydown", handleKeyDown, false );
     window.addEventListener( "keyup", handleKeyUp, false );
     
+    createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.setFPS(40);
     createjs.Ticker.addEventListener("tick", gameLoop);
 
@@ -191,10 +205,63 @@ function gameLoop(event) {
 
 // Functions for each game state:
 
+
+function setupHomeScreen(){
+
+    if(!isAtHome){
+
+        stage.clear();
+        middle = new createjs.Point(canvasW * 0.5, canvasH * 0.5);
+       
+        redBrand = new Brand("red-brand", middle.x + 2, middle.y -2, -2);
+        blackBrand = new Brand("black-brand", middle.x, middle.y, 0.3);
+        blueBrand = new Brand("blue-brand", middle.x - 2, middle.y + 2, 2);
+
+        brandContainer = new createjs.Container();
+
+        brandContainer.addChild(redBrand.img);
+        brandContainer.addChild(blueBrand.img);
+        //black on top
+        brandContainer.addChild(blackBrand.img);
+
+        stage.addChild(brandContainer);
+
+        stage.enableMouseOver(10);
+
+        // enable touch interaction on supported display
+	if (createjs.Touch.isSupported()) { createjs.Touch.enable(stage); }
+
+        stage.on("stagemousemove", handleMouseOver);
+
+        isAtHome = true;
+    }
+}
+
+// makes the brand move accordingly to cursor movement
+function handleMouseOver(evt){
+    log("handling cursor over at " + createjs.Ticker.getMeasuredFPS() + " fps.");
+
+    //read cursor coordinates
+    var cursorX = evt.stageX;
+    var cursorY = evt.stageY;
+
+    // create Point whit cursor 
+    var cursor = new createjs.Point(cursorX, cursorY);
+
+    // apply movement to the brands in stage
+    redBrand.update(cursor, middle);
+    blackBrand.update(cursor, middle);
+    blueBrand.update(cursor, middle);
+
+    stage.update();
+
+}
+
+
 function homeScreen () {
-    stage.clear();
-    var brand = getCentralizedBitmap("brand");
-    stage.addChild(brand);
+    
+    setupHomeScreen();
+
 }
 
 function playing(){
@@ -380,6 +447,8 @@ function handleKeyUp(event){
 
     if(state == Game.HOME){
     
+        // should stop mouse tracking (not working properly)
+        stage.enableMouseOver(0);
         state = Game.PLAYING;
         gameStart();
     
