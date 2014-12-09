@@ -50,6 +50,7 @@ var isAtHome = false;
 var display;
 var lorn;
 var diamond;
+var death;
 
 // GAME LISTS
 // for FireBalls
@@ -112,6 +113,7 @@ function preload() {
         { id: "tree",           src: "assets/images/tree.png"},
         { id: "diamond",        src: "assets/images/diamond.png"},
         { id: "brand",          src: "assets/images/gamebrand.png"},
+        { id: "death",          src: "assets/images/death.png"},
 
         { id: "controls",       src: "assets/images/controls.png"}
     ]);
@@ -298,6 +300,7 @@ function playing(){
     updateCats();
     lorn.update(GROUND_LEVEL);
     diamond.update(lorn.getSense(true), PARALLAX);
+    death.update();
 
     // get player status and update display screen
     display.update(lorn.toString());
@@ -581,6 +584,9 @@ function gameStart() {
 
         cats.push(new Cat());
     }
+
+    death = new Death(300, 100);
+    stage.addChild(death.animation);
 
     display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
     stage.addChild(display.label);

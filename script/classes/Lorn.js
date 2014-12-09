@@ -194,6 +194,7 @@ var Lorn = (function () {
     	this.velocityY +=GRAVITY;
     	// set lorn vertical position based on velocity
     	this.animation.y += this.velocityY;
+        if(this.animation.y < 24) this.animation.y = 24;
 
     	// check if lorn is back to the ground and ends jump arch
     	if(this.animation.y > groundLevel - this.regY){
