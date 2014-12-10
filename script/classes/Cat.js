@@ -1,10 +1,11 @@
 var CAT_MOVE = -9;
-var CAT_RELATIVE_X_VELOCITY = 4;
+var CAT_RELATIVE_X_VELOCITY = 0.8;
 var CAT_REG_Y = 16;
 
 // Cat Class
 
 var Cat = (function () {
+
 	function Cat() {
 
 		this.vertical_velocity = 3;
@@ -31,21 +32,25 @@ var Cat = (function () {
 
 	}
 
-	Cat.prototype.randomizeCatDrop = function (){
-		this.animation.x = canvasW + Math.random()* 100;
-		this.animation.y = (canvasH - CAT_REG_Y) * Math.random();
+	Cat.prototype.randomizeCatDrop = function (fall){
+
+		this.animation.x = canvasW + Math.random()* 500;
+		this.animation.y = (canvasH - CAT_REG_Y) ;
+		
+		if(fall) this.animation.y *= Math.random();
+
 		this.vertical_velocity = Math.floor(Math.random() * 3)+3;
 		this.onGroundLevel = false;
 	}
 
 
-	Cat.prototype.update = function (inertia) {
+	Cat.prototype.update = function (inertia, fall) {
 		
 		this.animation.x += (CAT_MOVE);// + (inertia*CAT_RELATIVE_X_VELOCITY);
 		if(inertia > 0){
 			this.animation.x += CAT_MOVE;
 		}if(inertia < 0){
-			this.animation.x += CAT_MOVE*-0.7;
+			this.animation.x += CAT_MOVE*-CAT_RELATIVE_X_VELOCITY;
 		}
 		if(!this.onGroundLevel){
 			if(this.animation.y < canvasH - CAT_REG_Y){
@@ -58,7 +63,7 @@ var Cat = (function () {
 		}
 
 		if(this.animation.x < 0)
-			this.randomizeCatDrop();
+			this.randomizeCatDrop(fall);
 	}
 
 	return Cat;

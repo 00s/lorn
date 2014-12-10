@@ -44,12 +44,16 @@ var Death = (function () {
     Death.prototype.wiggle = function () {
 
         this.animation.y += Math.sin(pvtToRad(pvtIncrementDegrees())) * Math.random() * 4;
-        this.animation.x += Math.cos(pvtToRad(pvtIncrementDegrees())) * Math.random() * 4;
+        this.animation.x += Math.cos(pvtToRad(pvtIncrementDegrees())) * Math.random() * 40;
     }
 
     Death.prototype.redefinePosition = function (canvasW) {
         
         this.animation.x = canvasW * NEXT_POS_FACTOR;
+    }
+
+    Death.prototype.canAttack = function(){
+        return (Math.random() * 20 < 1) ? true : false;
     }
 
     // CONSTANTS
@@ -65,7 +69,7 @@ var Death = (function () {
     // randomically increment and return 'degrees' value (up to 360)
     function pvtIncrementDegrees(){
 
-        degrees = (degrees + (Math.random() * 4) ) % 360;
+        degrees = (degrees + (Math.random() * 2) ) % 360;
         return degrees;
     }
 

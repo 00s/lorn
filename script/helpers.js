@@ -59,3 +59,12 @@ function getCentralizedBitmap(idOrUrl){
     bit.y = canvasH * 0.5;
     return bit;
 }
+
+
+// auxiliar function for removing object from list and animation from stage
+function dismiss(obj, list, index){
+    if(typeof obj !== 'undefined'){
+        stage.removeChild(obj.animation);
+        list.splice(index,1);
+    }
+}

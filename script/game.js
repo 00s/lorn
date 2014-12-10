@@ -23,6 +23,17 @@ Game = {
     PLAYING : 2,
     OVER : 3
 }
+
+// ENUM LEVELS
+Level =  {
+    FIRST: 1,
+    SECOND: 2,
+    THIRD: 3,
+    NONE: 4
+}
+// Level ref
+var actualLevel;
+
 // Game state
 var state;
 
@@ -50,7 +61,7 @@ var isAtHome = false;
 var display;
 var lorn;
 var diamond;
-var death;
+var death = null;
 
 // GAME LISTS
 // for FireBalls
@@ -61,6 +72,8 @@ var trees = [];
 var cats = [];
 // bestScores
 var bestScores = [];
+// deathballs
+var deathballs = [];
 
 // Game Constants
 var GROUND_LEVEL = Math.max( window.innerHeight, document.body.clientHeight);
@@ -85,7 +98,7 @@ function calculateMaxAspectRatio(){
 }    
 
 var TREE_NUM = 11;
-var CAT_NUM = 1;
+var CAT_NUM = 3;
 
 var PARALLAX = 8;
 
@@ -109,6 +122,7 @@ function preload() {
 
         { id: "lorn",           src: "assets/images/lorn-on-fire.png" },
         { id: "fireball",       src: "assets/images/fireball.png" },
+        { id: "deathball",       src: "assets/images/simbols.png" },
         { id: "cat",            src: "assets/images/cat.png"},
         { id: "tree",           src: "assets/images/tree.png"},
         { id: "diamond",        src: "assets/images/diamond.png"},
@@ -175,7 +189,6 @@ function init() {
     createjs.Ticker.setFPS(40);
     createjs.Ticker.addEventListener("tick", gameLoop);
 
-    //gameStart();
     state = Game.HOME;
 }
 
@@ -256,7 +269,6 @@ function handleMouseOver(evt){
     blueBrand.update(cursor, middle);
 
     stage.update();
-
 }
 
 
@@ -267,6 +279,25 @@ function homeScreen () {
 }
 
 function playing(){
+
+    if(playerIsAbleToNextLevel()){
+        setNextLevel();
+    }
+
+    switch(actualLevel){
+
+        case Level.FIRST:
+            prepareFirstLevel();
+            break;
+        
+        case Level.SECOND:
+            prepareSecondLevel();
+            break;
+        
+        case Level.THIRD:
+            prepareThirdLevel();
+            break;
+    }
 
     // check if lorn is still alive
     if(lorn.lives <= 0){
@@ -297,10 +328,19 @@ function playing(){
     // update all the elements in stage
     updateTrees();
     updateFireBalls();
+    updateDeathBalls();
     updateCats();
     lorn.update(GROUND_LEVEL);
     diamond.update(lorn.getSense(true), PARALLAX);
-    death.update();
+    
+    if(typeof death != 'undefined' && death != null){
+        death.update();
+        if (death.canAttack()) {
+                log("Death's shooted");
+                deathballs.push(new DeathBall(death.animation.x, death.animation.y));
+                stage.addChild(deathballs[deathballs.length - 1].animation);
+        };
+    }
 
     // get player status and update display screen
     display.update(lorn.toString());
@@ -308,6 +348,8 @@ function playing(){
 
 function gameover() {
     stage.clear();
+    death = null;
+    actualLevel = Level.NONE;
 
     stage.removeAllChildren();
     soundtrack.stop();
@@ -364,6 +406,35 @@ function updateTrees(){
     }
 }
 
+function updateDeathBalls(){
+
+    for (i = 0; i < deathballs.length; i++) {
+
+        var db = deathballs[i];
+        if(typeof db !== 'undefined'){
+            
+            db.update(lorn.getSense(true));
+
+            var dismissable = false;
+            
+            if(db.animation.y > canvasH + 25){
+                dismissable = true;
+            }
+
+            // check colision between deathballs and lorn
+            if(!dismissable && rectCollisionDetection(db, lorn)){
+                dismissable = true;
+                lorn.wasStricken();
+                log("Death stricken lorn");
+            }
+        
+            
+            if(dismissable)
+                dismiss(db, deathballs, i);
+        }
+    }
+}
+
 // update each fireball on stage and remove from stage the ones that are out of view.
 function updateFireBalls(){
     
@@ -398,9 +469,15 @@ function updateFireBalls(){
 }
 
 function updateCats(){
-    for (var count = 0; count < CAT_NUM; count++) {
+    
+    for (var count = 0; count < cats.length; count++) {
         
-        cats[count].update(lorn.getSense(true));
+        if(typeof cats[count] != 'undefined'){
+
+            var fall = (actualLevel == Level.FIRST) ? false : true;
+            cats[count].update(lorn.getSense(true), fall);
+    
+        }
     }
 }
 
@@ -453,7 +530,7 @@ function handleKeyUp(event){
         // should stop mouse tracking (not working properly)
         stage.enableMouseOver(0);
         state = Game.PLAYING;
-        gameStart();
+        prepareFirstLevel();
     
     }else{
 
@@ -492,22 +569,15 @@ function handleKeyUp(event){
             case Key.R:
                 if(state == Game.OVER){
                     state = Game.PLAYING;
-                    gameStart();
+                    prepareFirstLevel();
                 }
                 break;
     	}
-
     }
 }
 
-// auxiliar function for removing object from list and animation from stage
-function dismiss(obj, list, index){
-    if(typeof obj !== 'undefined'){
-        stage.removeChild(obj.animation);
-        list.splice(index,1);
-    }
-}
 
+// rectangular collision detection
 function rectCollisionDetection(obj, target){
     var frst = new AnimationBorder(obj);
     var scnd = new AnimationBorder(target);
@@ -515,11 +585,16 @@ function rectCollisionDetection(obj, target){
 
     var collision = true;
 
-    // If any side from FRST is outside of SCND
-    if( frst.bottomBound <= scnd.topBound || frst.topBound >= scnd.bottomBound || frst.rightBound <= scnd.leftBound|| frst.leftBound >= scnd.rightBound)
+    // check if parameters are defined
+    if (typeof obj == 'undefined' || typeof target == 'undefined')
     {
         collision = false;
     }
+    // and then, if any side from FRST is outside of SCND
+    else if( frst.bottomBound <= scnd.topBound || frst.topBound >= scnd.bottomBound || frst.rightBound <= scnd.leftBound|| frst.leftBound >= scnd.rightBound)
+    {
+        collision = false;
+    } 
 
     if(collision)
         log("colision detected.");
@@ -544,8 +619,9 @@ function arrangeBestScores(actualScore){
     bestScores.sort().reverse();
 }
 
-// Main Game Function
-function gameStart() {
+function prepareFirstLevel() {
+
+    if(actualLevel == Level.FIRST) return;
     
     stage.clear();
     stage.removeAllChildren();
@@ -580,16 +656,83 @@ function gameStart() {
     diamond = new Diamond(canvasW + 30, GROUND_LEVEL - lorn.regY);
     stage.addChild(diamond.animation);
 
+    // initialize cats
     for (var count = 0; count < CAT_NUM; count++) {
 
-        cats.push(new Cat());
+            cats.push(new Cat());
     }
 
-    death = new Death(300, 100);
-    stage.addChild(death.animation);
+
 
     display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
     stage.addChild(display.label);
+
+    console.log("FIRST LEVEL");
+    // set actual level
+    actualLevel = Level.FIRST;
+
+}
+
+function prepareSecondLevel(){
+
+    if(actualLevel == Level.SECOND) return;
+
+    console.log("SECOND LEVEL");
+    actualLevel = Level.SECOND;
+}
+
+function prepareThirdLevel(){
+
+    if(actualLevel == Level.THIRD) return;
+
+
+    death = new Death(canvasW * 0.5, 100);
+    stage.addChild(death.animation);
+    
+
+    console.log("THIRD LEVEL");
+    actualLevel = Level.THIRD;
 }
 
 
+
+function playerIsAbleToNextLevel(){
+
+    var isAble;
+
+    switch(actualLevel){
+
+        case Level.FIRST:
+            if(lorn.getTotalScore() > 1000)
+                isAble = true;
+            break;
+
+        case Level.SECOND:
+            
+            if(lorn.getTotalScore() > 2000)
+                isAble = true;
+            break;
+        
+        default:
+            isAble = false;
+            break;
+    }
+
+    return isAble;
+
+}
+
+function setNextLevel(){
+
+    switch(actualLevel){
+
+        case Level.FIRST:
+            prepareSecondLevel()
+            break;
+
+        case Level.SECOND:
+            prepareThirdLevel();
+            break;
+    }
+
+}
