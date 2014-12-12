@@ -50,6 +50,33 @@ var AnimationBorder = (function(){
     return AnimationBorder;
 })();
 
+// Helper Class for static animations used in stage
+var Gif = (function (){
+
+    function Gif (idOrUrl, x, y, frameH, frameW, frameRate){
+
+        this._height = frameH;
+        this._width  = frameW;
+
+        // spriteSheet setup
+        this.data = {
+            framerate: frameRate,
+            images: [queue.getResult(idOrUrl)],
+            frames: { width: this._width, height: this._height, regX: frameW * 0.5, regY: frameH * 0.5},
+            
+        };
+
+        this.spriteSheet = new createjs.SpriteSheet(this.data);
+        this.animation = new createjs.Sprite(this.spriteSheet);
+
+        // x and y params used for seting the object in stage
+        this.animation.x = x;
+        this.animation.y = y;
+    }
+
+    return Gif;
+})();
+
 // return a bitmap object with regX and regY defined at the middle of the image
 function getCentralizedBitmap(idOrUrl){
     var bit = new createjs.Bitmap(queue.getResult(idOrUrl));
@@ -80,4 +107,56 @@ function DisplayLevel(levelTxt){
     setTimeout(function(){
         stage.removeChildAt(disp.label);
     }, 2000);
+}
+
+
+
+// rectangular collision detection
+function rectCollisionDetection(obj, target){
+    var frst = new AnimationBorder(obj);
+    var scnd = new AnimationBorder(target);
+    //log("borders: " + scnd.leftBound + ", "+ scnd.rightBound + ", " + scnd.topBound+ ", " + scnd.bottomBound)
+
+    var collision = true;
+
+    // check if parameters are defined
+    if (typeof obj == 'undefined' || typeof target == 'undefined')
+    {
+        collision = false;
+    }
+    // and then, if any side from FRST is outside of SCND
+    else if( frst.bottomBound <= scnd.topBound 
+            || frst.topBound >= scnd.bottomBound 
+            || frst.rightBound <= scnd.leftBound
+            || frst.leftBound >= scnd.rightBound)
+    {
+        collision = false;
+    } 
+
+    if(collision)
+        log("colision detected.");
+
+    return collision;
+}
+
+// arrange  player's best scores in descending order
+function arrangeBestScores(actualScore){
+    
+    if(bestScores.length < 5){
+        
+        bestScores.push(actualScore);
+    }
+
+    else if (bestScores[bestScores.length - 1] < actualScore){
+        
+        bestScores.pop();
+        bestScores.push(actualScore);
+    }
+
+    bestScores.sort().reverse();
+}
+
+function changeCanvasColor(color){
+    document.getElementById("canvas").style.backgroundColor = color;
+    console.log(" color changed to " + color);
 }

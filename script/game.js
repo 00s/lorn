@@ -37,6 +37,9 @@ var actualLevel;
 // Game state
 var state;
 
+// Reminder on Home Screen
+var remind;
+
 // Loading Message
 var loadingMSG;
 
@@ -109,9 +112,10 @@ var FONT_COLOUR = "white";
 function preload() {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
+
     queue.addEventListener("loadstart", loading);
-    
     queue.addEventListener("complete", init);
+
     queue.loadManifest([
 
         { id: "diamond-song",   src: "assets/sounds/Lorn-Diamond.mp3" },
@@ -220,8 +224,7 @@ function gameLoop(event) {
 
 // Functions for each game state:
 
-
-function setupHomeScreen(){
+function homeScreen(){
 
     if(!isAtHome){
 
@@ -243,7 +246,7 @@ function setupHomeScreen(){
 
         stage.enableMouseOver(10);
 
-        setTimeout(
+        remind = setTimeout(
             function(){
                 var reminder = new Display("press any key to start.", 
                                             FONT_SIZE * 0.75, 
@@ -283,12 +286,6 @@ function handleMouseOver(evt){
     stage.update();
 }
 
-
-function homeScreen () {
-    
-    setupHomeScreen();
-
-}
 
 function playing(){
 
@@ -402,6 +399,9 @@ function displayControls(){
     }
 }
 
+
+// UPDATE FUNCTIONS FOR LISTS
+
 //updates all trees in stage
 function updateTrees(){
     
@@ -494,7 +494,7 @@ function updateCats(){
     }
 }
 
-// Keyboard handlers
+// KEYBOARD HANDLERS
 
 function handleKeyDown(event){
 
@@ -590,54 +590,14 @@ function handleKeyUp(event){
 }
 
 
-// rectangular collision detection
-function rectCollisionDetection(obj, target){
-    var frst = new AnimationBorder(obj);
-    var scnd = new AnimationBorder(target);
-    //log("borders: " + scnd.leftBound + ", "+ scnd.rightBound + ", " + scnd.topBound+ ", " + scnd.bottomBound)
-
-    var collision = true;
-
-    // check if parameters are defined
-    if (typeof obj == 'undefined' || typeof target == 'undefined')
-    {
-        collision = false;
-    }
-    // and then, if any side from FRST is outside of SCND
-    else if( frst.bottomBound <= scnd.topBound 
-            || frst.topBound >= scnd.bottomBound 
-            || frst.rightBound <= scnd.leftBound
-            || frst.leftBound >= scnd.rightBound)
-    {
-        collision = false;
-    } 
-
-    if(collision)
-        log("colision detected.");
-
-    return collision;
-}
-
-// arrange  player's best scores in descending order
-function arrangeBestScores(actualScore){
-    
-    if(bestScores.length < 5){
-        
-        bestScores.push(actualScore);
-    }
-
-    else if (bestScores[bestScores.length - 1] < actualScore){
-        
-        bestScores.pop();
-        bestScores.push(actualScore);
-    }
-
-    bestScores.sort().reverse();
-}
-
 function prepareFirstLevel() {
 
     if(actualLevel == Level.FIRST) return;
+
+    // prevent msg from homeScreen to show up
+    clearTimeout(remind); 
+
+    changeCanvasColor("#003380");
     
     stage.clear();
     stage.removeAllChildren();
