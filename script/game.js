@@ -243,8 +243,20 @@ function setupHomeScreen(){
 
         stage.enableMouseOver(10);
 
-        // enable touch interaction on supported display
-	if (createjs.Touch.isSupported()) { createjs.Touch.enable(stage); }
+        setTimeout(
+            function(){
+                var reminder = new Display("press any key to start.", 
+                                            FONT_SIZE * 0.75, 
+                                            GAME_FONT, FONT_COLOUR, 
+                                            canvasW * 0.5, 
+                                            canvasH * 0.85);
+
+                stage.addChild(reminder.label);
+        }, 5000);
+        
+
+       // enable touch interaction on supported display
+	   if (createjs.Touch.isSupported()) { createjs.Touch.enable(stage); }
 
         stage.on("stagemousemove", handleMouseOver);
 
@@ -282,6 +294,7 @@ function playing(){
 
     if(playerIsAbleToNextLevel()){
         setNextLevel();
+        lorn.oneMoreLife();
     }
 
     switch(actualLevel){
@@ -591,7 +604,10 @@ function rectCollisionDetection(obj, target){
         collision = false;
     }
     // and then, if any side from FRST is outside of SCND
-    else if( frst.bottomBound <= scnd.topBound || frst.topBound >= scnd.bottomBound || frst.rightBound <= scnd.leftBound|| frst.leftBound >= scnd.rightBound)
+    else if( frst.bottomBound <= scnd.topBound 
+            || frst.topBound >= scnd.bottomBound 
+            || frst.rightBound <= scnd.leftBound
+            || frst.leftBound >= scnd.rightBound)
     {
         collision = false;
     } 
@@ -662,7 +678,7 @@ function prepareFirstLevel() {
             cats.push(new Cat());
     }
 
-
+    DisplayLevel("1ST LEVEL");
 
     display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
     stage.addChild(display.label);
@@ -673,28 +689,29 @@ function prepareFirstLevel() {
 
 }
 
+
 function prepareSecondLevel(){
 
-    if(actualLevel == Level.SECOND) return;
+    if(actualLevel == Level.SECOND) 
+        return;
 
-    console.log("SECOND LEVEL");
+    DisplayLevel("2ND LEVEL");
+
     actualLevel = Level.SECOND;
 }
 
 function prepareThirdLevel(){
 
-    if(actualLevel == Level.THIRD) return;
-
+    if(actualLevel == Level.THIRD) 
+        return;
 
     death = new Death(canvasW * 0.5, 100);
     stage.addChild(death.animation);
     
+    DisplayLevel("3RD LEVEL");
 
-    console.log("THIRD LEVEL");
     actualLevel = Level.THIRD;
 }
-
-
 
 function playerIsAbleToNextLevel(){
 
@@ -703,13 +720,13 @@ function playerIsAbleToNextLevel(){
     switch(actualLevel){
 
         case Level.FIRST:
-            if(lorn.getTotalScore() > 1000)
+            if(lorn.getTotalScore() > 300)
                 isAble = true;
             break;
 
         case Level.SECOND:
             
-            if(lorn.getTotalScore() > 2000)
+            if(lorn.getTotalScore() > 600)
                 isAble = true;
             break;
         

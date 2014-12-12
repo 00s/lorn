@@ -181,6 +181,11 @@ var Lorn = (function () {
         this.fireballs += 10;
     }
 
+    Lorn.prototype.oneMoreLife = function () {
+        
+        this.lives++;
+    }
+
     // return Lorn's total score
     Lorn.prototype.getTotalScore = function (){
         var total = this.coveredDistance * 0.1 + this.score 

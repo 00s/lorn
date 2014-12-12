@@ -68,3 +68,16 @@ function dismiss(obj, list, index){
         list.splice(index,1);
     }
 }
+
+// auxiliar function for displaying the actual level with preset definitions
+function DisplayLevel(levelTxt){
+
+    var disp = new Display(levelTxt, FONT_SIZE, GAME_FONT, FONT_COLOUR, canvasW * 0.5, canvasH * 0.5);
+    stage.addChildAt(disp.label);
+
+    log(levelTxt);
+    
+    setTimeout(function(){
+        stage.removeChildAt(disp.label);
+    }, 2000);
+}
