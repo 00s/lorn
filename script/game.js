@@ -348,14 +348,17 @@ function updateTrees(){
     
     for(var count = 0 ; count < TREE_NUM ; count++){
         var tree = trees[count];
-        tree.update(lorn.getSense(true), PARALLAX);
-        
-        // reuse trees when they are out of the bounds
-        if(tree.image.x < -(canvasW * 0.5)){
-            tree.image.x = canvasW + canvasW * 0.25;
-        }
-        if(tree.image.x > canvasW + canvasW * 0.5){
-            tree.image.x = -(canvasW * 0.25)
+        if(typeof tree != 'undefined'){
+            
+            tree.update(lorn.getSense(true), PARALLAX);
+            
+            // reuse trees when they are out of the bounds
+            if(tree.image.x < -(canvasW * 0.5)){
+                tree.image.x = canvasW + canvasW * 0.25;
+            }
+            if(tree.image.x > canvasW + canvasW * 0.5){
+                tree.image.x = -(canvasW * 0.25)
+            }
         }
     }
 }
