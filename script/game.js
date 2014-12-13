@@ -63,7 +63,7 @@ function loading(){
 
     log("BEFORE\nheight: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
 
-    calculateMaxAspectRatio();
+    //calculateMaxAspectRatio();
 
     log("AFTER\nheight: " + GROUND_LEVEL + "\nwidth: " + CANVAS_WIDTH);
 
@@ -625,13 +625,13 @@ function playerIsAbleToNextLevel(){
     switch(actualLevel){
 
         case Level.FIRST:
-            if(lorn.getTotalScore() > 300)
+            if(lorn.getTotalScore() > 1000)
                 isAble = true;
             break;
 
         case Level.SECOND:
             
-            if(lorn.getTotalScore() > 600)
+            if(lorn.getTotalScore() > 2000)
                 isAble = true;
             break;
         

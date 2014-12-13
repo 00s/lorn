@@ -3,4 +3,8 @@ canvas{
 	display: block;
 	margin: auto;
 	cursor: none;
+	max-width: 99%;
+	max-height: 95%;
+}
+body{
 }

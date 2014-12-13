@@ -4,7 +4,7 @@ var RECOVERING_TIME = 1300;
 var DISTANCE_PER_MOVE = 10;
 var HIT_CAT_SCORE = 50;
 var GRAVITY  = 0.6;
-var LIVES = 1;
+var LIVES = 3;
 
 // width and height reference for spriteShitData
 var LORN_FRAME_W = 28;
