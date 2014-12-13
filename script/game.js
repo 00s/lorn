@@ -44,7 +44,10 @@ var remind;
 var loadingMSG;
 
 // controls (bitmap img)
-var controls
+var controls;
+// display level
+var dispLevel;
+
 
 // reference for Instructions
 var dejavuControls = false;
@@ -133,6 +136,7 @@ function preload() {
         { id: "brand",          src: "assets/images/gamebrand.png"},
         { id: "death",          src: "assets/images/death.png"},
 
+        { id: "skull",       src: "assets/images/skull.png"},
         { id: "controls",       src: "assets/images/controls.png"}
     ]);
 }
@@ -314,7 +318,7 @@ function playing(){
         // capture lorn final scores
         lastStatus = lorn.getTotalScore();
         arrangeBestScores(lastStatus);
-        state = Game.OVER;
+        gameover();
     }
 
     // if he was not Strick
@@ -357,26 +361,41 @@ function playing(){
 }
 
 function gameover() {
+    
+    if (state == Game.OVER) return;
+    
+    clearTimeout(dispLevel);
+
     stage.clear();
+
+    changeCanvasColor("black");
+
     death = null;
     actualLevel = Level.NONE;
 
+    // remove children in stage and empty arrays references
     stage.removeAllChildren();
     soundtrack.stop();
     fireballs = [];
     trees = [];
     cats = [];
 
-    var gameoverMsg = new Display("GAME OVER", 50, "VT323", "white", canvasW * 0.5, canvasH *0.2);
+
+
+    var gameoverMsg = new Display("GAME   OVER", 50, "VT323", "white", canvasW * 0.5, canvasH *0.2);
     var scores = new Display("YOU SCORED "+ lastStatus, 85, "VT323", "white", canvasW * 0.5, canvasH *0.4);
     var theBest = new Display("BEST SCORES: "+ bestScores, 35, "VT323", "white", canvasW * 0.5, canvasH *0.6);
-    var reminder = endMessage = new Display("press R to restart", 50, "VT323", "white", canvasW * 0.5, canvasH *0.8);
+    var reminder = endMessage = new Display("press R to restart", 40, "VT323", "white", canvasW * 0.5, canvasH *0.8);
+    var skull = new Gif("skull", canvasW * 0.5, canvasH * 0.22, 36, 52);
     
     stage.addChild(gameoverMsg.label);
     stage.addChild(scores.label);
     stage.addChild(theBest.label);
     stage.addChild(reminder.label);
+    stage.addChild(skull.animation);
     
+    state = Game.OVER;
+
 }
 
 function displayControls(){
@@ -638,7 +657,7 @@ function prepareFirstLevel() {
             cats.push(new Cat());
     }
 
-    DisplayLevel("1ST LEVEL");
+    dispLevel = DisplayLevel("1ST LEVEL");
 
     display = new Display(".", FONT_SIZE, GAME_FONT, FONT_COLOUR, 15, 0);
     stage.addChild(display.label);
@@ -655,7 +674,7 @@ function prepareSecondLevel(){
     if(actualLevel == Level.SECOND) 
         return;
 
-    DisplayLevel("2ND LEVEL");
+    dispLevel = DisplayLevel("2ND LEVEL");
 
     actualLevel = Level.SECOND;
 }
@@ -668,7 +687,7 @@ function prepareThirdLevel(){
     death = new Death(canvasW * 0.5, 100);
     stage.addChild(death.animation);
     
-    DisplayLevel("3RD LEVEL");
+    dispLevel = DisplayLevel("3RD LEVEL");
 
     actualLevel = Level.THIRD;
 }

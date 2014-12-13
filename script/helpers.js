@@ -53,21 +53,32 @@ var AnimationBorder = (function(){
 // Helper Class for static animations used in stage
 var Gif = (function (){
 
-    function Gif (idOrUrl, x, y, frameH, frameW, frameRate){
+    function Gif (idOrUrl, x, y, frameW, frameH){
 
-        this._height = frameH;
         this._width  = frameW;
+        this._height = frameH;
 
         // spriteSheet setup
         this.data = {
-            framerate: frameRate,
             images: [queue.getResult(idOrUrl)],
-            frames: { width: this._width, height: this._height, regX: frameW * 0.5, regY: frameH * 0.5},
-            
+            frames: {   width: this._width, 
+                        height: this._height, 
+                        regX: frameW * 0.5, 
+                        regY: frameH * 0.5
+            },
+
+            animations: {
+                s: {
+                    frames: [0,1,2,3,4,5],
+                    next: "s",
+                    speed: 0.4
+                }
+            }
+
         };
 
         this.spriteSheet = new createjs.SpriteSheet(this.data);
-        this.animation = new createjs.Sprite(this.spriteSheet);
+        this.animation = new createjs.Sprite(this.spriteSheet, "s");
 
         // x and y params used for seting the object in stage
         this.animation.x = x;
@@ -104,9 +115,11 @@ function DisplayLevel(levelTxt){
 
     log(levelTxt);
     
-    setTimeout(function(){
+    var timeout = setTimeout(function(){
         stage.removeChildAt(disp.label);
     }, 2000);
+
+    return timeout;
 }
 
 
